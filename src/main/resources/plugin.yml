@@ -7,7 +7,7 @@ authors: [ Sh0tix ]
 commands: 
   customWhitelistV2:
     description: "Manage the CustomWhitelistV2 plugin via this command"
-    usage: "/customWhitelistV2 <addPlayer|removePlayer|listPlayers|statusOfPlayer|updatePlayerStatus|updatePassword|checkPassword|checkLoginFunctionality|help>"
+    usage: "/customWhitelistV2 <enableOrDisableASubCommand|addPlayer|removePlayer|listPlayers|statusOfPlayer|updatePlayerStatus|updatePassword|checkPassword|checkLoginFunctionality|help>"
     permission: "customwhitelistv2.manage"
     aliases: [ cwv2 ]
     
