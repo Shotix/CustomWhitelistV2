@@ -11,6 +11,7 @@ public class CWV2Player {
         KICKED,
         TEMP_BANNED,
         TEMP_KICKED,
+        REMOVED,
         UNKNOWN
     }
     
