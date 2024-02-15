@@ -1,0 +1,18 @@
+name: CustomWhitelistV2
+version: '${project.version}'
+main: org.sh0tix.customwhitelistv2.CustomWhitelistV2
+api-version: '1.20'
+authors: [ Sh0tix ]
+
+commands: 
+  customWhitelistV2:
+    description: "Manage the CustomWhitelistV2 plugin via this command"
+    usage: "/customWhitelistV2 <reload|addPlayer|removePlayer|listPlayers|statusOfPlayer|updatePlayerStatus|updatePassword|checkPassword|checkLoginFunctionality|help>"
+    permission: "customwhitelistv2.manage"
+    aliases: [ cwv2 ]
+    
+  login:
+    description: "Login to the server"
+    usage: "/login <password>"
+    permission: "customwhitelistv2.login"
+    aliases: [ l ]
