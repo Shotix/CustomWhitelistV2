@@ -1,5 +1,6 @@
 package org.sh0tix.customwhitelistv2.commands;
 
+import com.destroystokyo.paper.utils.PaperPluginLogger;
 import com.google.common.base.CaseFormat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -7,6 +8,7 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.apache.commons.lang3.EnumUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.command.Command;
@@ -25,6 +27,7 @@ import org.sh0tix.customwhitelistv2.whitelist.CWV2Player;
 
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 public class CustomWhitelistV2Commands implements CommandExecutor {
     
@@ -35,6 +38,7 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
     }
     
     private enum AllCommands {
+        ENABLE_OR_DISABLE_SUB_COMMAND,
         ADD_PLAYER,
         REMOVE_PLAYER,
         LIST_PLAYERS,
@@ -55,6 +59,7 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
     }
     
     private void initialiseCommandMapping() {
+        commandDescriptionHashMap.put("enableOrDisableSubCommand", AllCommands.ENABLE_OR_DISABLE_SUB_COMMAND);
         commandDescriptionHashMap.put("addPlayer", AllCommands.ADD_PLAYER);
         commandDescriptionHashMap.put("removePlayer", AllCommands.REMOVE_PLAYER);
         commandDescriptionHashMap.put("listPlayers", AllCommands.LIST_PLAYERS);
@@ -72,6 +77,7 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
         }
         
         // Set the commands that are active to active
+        commandStatusHashMap.put(AllCommands.UPDATE_PLAYER_STATUS, CommandStatus.ACTIVE);
         commandStatusHashMap.put(AllCommands.REMOVE_PLAYER, CommandStatus.ACTIVE);
         commandStatusHashMap.put(AllCommands.UPDATE_PASSWORD, CommandStatus.ACTIVE);
         commandStatusHashMap.put(AllCommands.CHECK_PASSWORD, CommandStatus.ACTIVE);
@@ -100,6 +106,40 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
         }
 
         switch (subcommand) {
+            case "enableOrDisableASubCommand":
+                // Enable logic here
+                // Get the subcommand from the args
+                String subCommandToEnableOrDisable = args[1];
+                
+                // Get the status from the args
+                String enableOrDisable = args[2];
+                
+                // Check if the sub command is a valid sub command
+                if (!EnumUtils.isValidEnum(AllCommands.class, subCommandToEnableOrDisable)) {
+                    commandSender.sendMessage("Unknown subcommand");
+                    return true;
+                }
+                
+                // Check if the enableOrDisable is a valid status
+                if (!enableOrDisable.equalsIgnoreCase("true") && !enableOrDisable.equalsIgnoreCase("false")) {
+                    commandSender.sendMessage("Unknown status");
+                    return true;
+                }
+                
+                // Get the sub command as an enum
+                AllCommands subCommandAsEnum = EnumUtils.getEnum(AllCommands.class, subCommandToEnableOrDisable);
+                
+                // Set the status of the sub command
+                if (enableOrDisable.equalsIgnoreCase("true")) {
+                    setCommandStatus(subCommandAsEnum, CommandStatus.ACTIVE);
+                    commandSender.sendMessage("Enabled the subcommand");
+                } else {
+                    setCommandStatus(subCommandAsEnum, CommandStatus.INACTIVE);
+                    commandSender.sendMessage("Disabled the subcommand");
+                }
+                
+                break;
+            
             case "addPlayer":
                 // Add logic here
                 commandSender.sendMessage("Added a player to the custom whitelist list");
@@ -162,6 +202,76 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
             case "updatePlayerStatus":
                 // Update player logic here
                 commandSender.sendMessage("Update the status of a player in the custom whitelist");
+                
+                // Get the player name from the args
+                String playerNameToUpdate = args[1];
+                
+                // Get the player UUID from the player name
+                String playerUuidToUpdate = PlayerStatusHandler.getPlayerUuidFromName(playerNameToUpdate);
+                
+                // If the playerUuid is null, give the player a message that the player is not found
+                if (playerUuidToUpdate == null) {
+                    commandSender.sendMessage(Component.text("§cThe player §a" + playerNameToUpdate + "§c is not found"));
+                    return true;
+                }
+                
+                // Get the status from the args
+                String status = args[2];
+                
+                // Check if the status is valid
+                try {
+                    CWV2Player.Status.valueOf(status);
+                } catch (IllegalArgumentException e) {
+                    commandSender.sendMessage(Component.text("§cThe status §a" + status + "§c is not valid"));
+                    return true;
+                }
+                
+                // Update the status of the player
+                PlayerStatusHandler.updatePlayerStatus(playerUuidToUpdate, CWV2Player.Status.valueOf(status));
+                
+                // Send the command sender a message that the status of the player has been updated
+                commandSender.sendMessage(Component.text("§aUpdated the status of the player §c" + playerNameToUpdate + "§a to §c" + status));
+                
+                // Check if the updated player is currently online
+                Player playerOnline = Bukkit.getPlayer(playerNameToUpdate);
+                
+                if (playerOnline != null) {
+                    // Send the player a message that their status has been updated
+                    playerOnline.sendMessage(Component.text("§aYour status has been updated to §c" + status));
+                }
+
+                // Handle different updated statuses
+                switch (CWV2Player.Status.valueOf(status)) {
+                    case WHITELISTED:
+                        // If the player is online, give the player all the effects a whitelisted player would have
+                        if (playerOnline != null) {
+                            WhitelistHandler.enablePlayerMovementAndSight(playerOnline);
+                        }
+                        break;
+                    case NOT_WHITELISTED:
+                        // If the player is online, give the player all the effects a non whitelisted player would have
+                        if (playerOnline != null) {
+                            WhitelistHandler.disablePlayerMovementAndSight(playerOnline);
+                        }
+                        break;
+                    case BANNED, KICKED, TEMP_BANNED, TEMP_KICKED:
+                        // If the player is online, give the player all the effects a banned player would have
+                        if (playerOnline != null) {
+                            WhitelistHandler.disablePlayerMovementAndSight(playerOnline);
+                        }
+                        break;
+                    case REMOVED:
+                        // If the player is online, give the player all the effects a removed player would have
+                        if (playerOnline != null) {
+                            WhitelistHandler.disablePlayerMovementAndSight(playerOnline);
+                        }
+                        break;
+                    case UNKNOWN:
+                        // This should never happen. Log an error message
+                        PaperPluginLogger.getLogger(Logger.GLOBAL_LOGGER_NAME).severe("The status of the player is unknown. This should never happen");
+                        break;
+                }
+                
                 break;
 
             case "updatePassword":
@@ -199,7 +309,7 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 break;
                 
             default:
-                commandSender.sendMessage("Unknown subcommand");
+                commandSender.sendMessage("The subcommand + " + subcommand + " is not valid");
                 break;
         }
 
