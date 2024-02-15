@@ -93,10 +93,7 @@ public class PlayerStatusHandler {
         Gson gson = new Gson();
 
         try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-            Type playerListType = new TypeToken<List<CWV2Player>>(){}.getType();
-            List<CWV2Player> players = gson.fromJson(bufferedReader, playerListType);
-            bufferedReader.close();
+            List<CWV2Player> players = getCwv2PlayersList(file, gson);
 
             // If there are no players in the JSON file, return null
             if (players == null) {
@@ -113,7 +110,19 @@ public class PlayerStatusHandler {
         }
         return null;
     }
-    
+
+    /**
+     * Get all players from the JSON file
+     * @return A list of all players
+     */
+    private static List<CWV2Player> getCwv2PlayersList(File file, Gson gson) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+        Type playerListType = new TypeToken<List<CWV2Player>>(){}.getType();
+        List<CWV2Player> players = gson.fromJson(bufferedReader, playerListType);
+        bufferedReader.close();
+        return players;
+    }
+
     /**
      * Update the status of a player
      * @param playerUUID The UUID of the player to update
@@ -191,11 +200,8 @@ public class PlayerStatusHandler {
                 .create();
 
         try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-            Type playerListType = new TypeToken<List<CWV2Player>>(){}.getType();
-            List<CWV2Player> players = gson.fromJson(bufferedReader, playerListType);
-            bufferedReader.close();
-            
+            List<CWV2Player> players = getCwv2PlayersList(file, gson);
+
             // If there are no players in the JSON file, return null
             if (players == null) {
                 return;
@@ -233,14 +239,32 @@ public class PlayerStatusHandler {
         Gson gson = new Gson();
 
         try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-            Type playerListType = new TypeToken<List<CWV2Player>>(){}.getType();
-            
-            List<CWV2Player> playersList = gson.fromJson(bufferedReader, playerListType);
-            bufferedReader.close();
-            return playersList;
+            return getCwv2PlayersList(file, gson);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    public static String getPlayerUuidFromName(String name) {
+        File file = getFile();
+        Gson gson = new Gson();
+
+        try {
+            List<CWV2Player> players = getCwv2PlayersList(file, gson);
+
+            // If there are no players in the JSON file, return null
+            if (players == null) {
+                return null;
+            }
+            
+            for (CWV2Player player : players) {
+                if (player.getName().equals(name)) {
+                    return player.getUuid();
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
     }
 }
