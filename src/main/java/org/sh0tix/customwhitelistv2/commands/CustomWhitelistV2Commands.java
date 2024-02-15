@@ -1,27 +1,20 @@
 package org.sh0tix.customwhitelistv2.commands;
 
 import com.destroystokyo.paper.utils.PaperPluginLogger;
-import com.google.common.base.CaseFormat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.apache.commons.lang3.EnumUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.sh0tix.customwhitelistv2.handlers.PasswordHandler;
 import org.sh0tix.customwhitelistv2.handlers.PlayerStatusHandler;
-import org.sh0tix.customwhitelistv2.handlers.SendMessageToPlayer;
 import org.sh0tix.customwhitelistv2.handlers.WhitelistHandler;
 import org.sh0tix.customwhitelistv2.whitelist.CWV2Player;
 
@@ -50,8 +43,8 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
         HELP
     }
     
-    private HashMap<AllCommands, CommandStatus> commandStatusHashMap = new HashMap<>();
-    private HashMap<String, AllCommands> commandDescriptionHashMap = new HashMap<>();
+    private final HashMap<AllCommands, CommandStatus> commandStatusHashMap = new HashMap<>();
+    private final HashMap<String, AllCommands> commandDescriptionHashMap = new HashMap<>();
     
     public CustomWhitelistV2Commands() {
         initialiseCommandStatus();
