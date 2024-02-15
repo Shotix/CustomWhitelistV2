@@ -1,6 +1,10 @@
 package org.sh0tix.customwhitelistv2.listener;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
@@ -18,6 +22,7 @@ import org.sh0tix.customwhitelistv2.handlers.WhitelistHandler;
 import org.sh0tix.customwhitelistv2.whitelist.CWV2Player;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class EventListener implements Listener {
@@ -134,6 +139,34 @@ public class EventListener implements Listener {
             case TEMP_KICKED -> {
                 // Player is temporarily kicked. Kick them from the server and tell them when they can join again
                 
+            }
+            
+            case REMOVED -> {
+                // Player is removed from the custom whitelist. Disable movement, the ability to see, chat and tell the user they have been removed from the whitelist
+                WhitelistHandler.disablePlayerMovementAndSight(playerJoinEvent.getPlayer());
+                
+                /*
+                * Construct the message that will be send to the player
+                * The message will look like this:
+                *   "You have been removed from the custom whitelist by a moderator"
+                *   "You can no longer play on the server"
+                *   "If you think this is a mistake, please contact a moderator or administrator"
+                 */
+                Component kickMessage = Component.text()
+                        .append(Component.text("You have been removed from the custom whitelist by a moderator. ", NamedTextColor.RED, TextDecoration.BOLD))
+                        .append(Component.text("You can no longer play on the server. ", NamedTextColor.RED, TextDecoration.BOLD))
+                        .append(Component.text("If you think this is a mistake, ", NamedTextColor.RED, TextDecoration.BOLD))
+                        .append(Component.text("click here", NamedTextColor.BLUE, TextDecoration.UNDERLINED)
+                                .hoverEvent(HoverEvent.showText(Component.text("Click to send a help requests to the moderators", NamedTextColor.GREEN)))
+                                .clickEvent(ClickEvent.runCommand("/mm " + Objects.requireNonNull(playerJoinEvent.getPlayer().getName()) + " needs help with the custom whitelist. Please help them.")))
+                        .append(Component.text(" or contact an administrator.", NamedTextColor.RED, TextDecoration.BOLD))
+                        .append(Component.text("\nIf you want to write a custom message to the moderators, ", NamedTextColor.RED, TextDecoration.BOLD))
+                        .append(Component.text("you can use the command ", NamedTextColor.RED, TextDecoration.BOLD))
+                        .append(Component.text("/msgmoderator <message>", NamedTextColor.BLUE, TextDecoration.UNDERLINED))
+                        .build();
+                
+                // Player is removed from the custom whitelist. Tell the user they have been removed from the whitelist
+                playerJoinEvent.getPlayer().sendMessage(kickMessage);
             }
         }
     }
