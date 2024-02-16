@@ -7,7 +7,7 @@ authors: [ Sh0tix ]
 commands: 
   customWhitelistV2:
     description: "Manage the CustomWhitelistV2 plugin via this command"
-    usage: "/customWhitelistV2 <reload|addPlayer|removePlayer|listPlayers|statusOfPlayer|updatePlayerStatus|updatePassword|checkPassword|checkLoginFunctionality|help>"
+    usage: "/customWhitelistV2 <enableOrDisableASubCommand|listAllActivatedSubCommands|addPlayer|removePlayer|listPlayers|statusOfPlayer|updatePlayerStatus|updatePassword|checkPassword|checkLoginFunctionality|help>"
     permission: "customwhitelistv2.manage"
     aliases: [ cwv2 ]
     
@@ -16,3 +16,8 @@ commands:
     usage: "/login <password>"
     permission: "customwhitelistv2.login"
     aliases: [ l ]
+    
+  msgModerator:
+    description: "Send a message to all moderators"
+    usage: "/msgModerator <message>"
+    aliases: [ mm ]
