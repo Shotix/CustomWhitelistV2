@@ -64,9 +64,9 @@ public class PlayerStatusHandler {
                 .setPrettyPrinting()
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
                 .create();
-        
+
         try {
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
+            // First, read the existing players from the file
             List<CWV2Player> players = gson.fromJson(new FileReader(file), new TypeToken<List<CWV2Player>>(){}.getType());
 
             // Check if players is null and initialize it if it is
@@ -75,6 +75,9 @@ public class PlayerStatusHandler {
             }
 
             players.add(player);
+
+            // Then, create the BufferedWriter and write the updated list of players to the file
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
             String json = gson.toJson(players);
             bufferedWriter.write(json);
             bufferedWriter.close();
@@ -228,7 +231,7 @@ public class PlayerStatusHandler {
                     player.setLastUpdated(updatedPlayerInformation.getLastUpdated());
                     player.setNumberOfWrongPasswordsEntered(updatedPlayerInformation.getNumberOfWrongPasswordsEntered());
                     player.setNumberOfTimesJoined(updatedPlayerInformation.getNumberOfTimesJoined());
-                    player.setName(updatedPlayerInformation.getName());
+                    player.setUsername(updatedPlayerInformation.getUsername());
                 }
             }
 
@@ -269,7 +272,7 @@ public class PlayerStatusHandler {
             }
             
             for (CWV2Player player : players) {
-                if (player.getName().equals(name)) {
+                if (player.getUsername().equals(name)) {
                     return player.getUuid();
                 }
             }
