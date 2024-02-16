@@ -21,6 +21,7 @@ import org.sh0tix.customwhitelistv2.handlers.WhitelistHandler;
 import org.sh0tix.customwhitelistv2.whitelist.CWV2Player;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -74,6 +75,7 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
         }
         
         // Set the commands that are active to active
+        commandStatusHashMap.put(AllCommands.listPlayers, CommandStatus.ACTIVE);
         commandStatusHashMap.put(AllCommands.statusOfPlayer, CommandStatus.ACTIVE);
         commandStatusHashMap.put(AllCommands.updatePlayerStatus, CommandStatus.ACTIVE);
         commandStatusHashMap.put(AllCommands.removePlayer, CommandStatus.ACTIVE);
@@ -103,6 +105,8 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
             return true;
         }
 
+        String playerName = null;
+        String playerUuid = null;
         
         
         switch (subcommand) {
@@ -174,10 +178,10 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
             case "removePlayer":
                 // Remove logic here
                 // Get the player name from the args
-                String playerName = args[1];
+                playerName = args[1];
                 
                 // Get the player UUID from the player name
-                String playerUuid = PlayerStatusHandler.getPlayerUuidFromName(playerName);
+                playerUuid = PlayerStatusHandler.getPlayerUuidFromName(playerName);
                 
                 // If the playerUuid is null, give the player a message that the player is not found
                 if (playerUuid == null) {
@@ -220,15 +224,42 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 
             case "listPlayers":
                 // List logic here
-                commandSender.sendMessage("Listed the players in the custom whitelist");
+                // Get a list of all players
+                List<CWV2Player> players = PlayerStatusHandler.getAllPlayers();
+
+                // Create a new message
+                SendMessageToPlayer messageToPlayer = new SendMessageToPlayer();
+                messageToPlayer.addPartToMessage("The following players are in the custom whitelist:\n", Color.YELLOW);
+                messageToPlayer.addPartToMessage("Whitelisted players:\n", Color.GREEN);
+                for (CWV2Player whitelistedPlayer : players) {
+                    if (whitelistedPlayer.getStatus() == CWV2Player.Status.WHITELISTED) {
+                        messageToPlayer.addPartToMessage(whitelistedPlayer.getName() + "\n", Color.WHITE);
+                    }
+                }
+                messageToPlayer.addPartToMessage("\nNon-whitelisted players:\n", Color.YELLOW);
+                for (CWV2Player nonWhitelistedPlayer : players) {
+                    if (nonWhitelistedPlayer.getStatus() == CWV2Player.Status.NOT_WHITELISTED) {
+                        messageToPlayer.addPartToMessage(nonWhitelistedPlayer.getName() + "\n", Color.WHITE);
+                    }
+                }
+                messageToPlayer.addPartToMessage("\nOther players:", Color.RED);
+                for (CWV2Player otherPlayer : players) {
+                    if (otherPlayer.getStatus() != CWV2Player.Status.WHITELISTED && otherPlayer.getStatus() != CWV2Player.Status.NOT_WHITELISTED) {
+                        messageToPlayer.addPartToMessage("\n" + otherPlayer.getName(), Color.WHITE);
+                        messageToPlayer.addPartToMessage(" - ", Color.WHITE);
+                        messageToPlayer.addPartToMessage(otherPlayer.getStatus().toString(), Color.RED);
+                    }
+                }
+                
+                // Send the message to the command sender
+                commandSender.sendMessage(messageToPlayer.getMessage());
+                
                 break;
 
                 
                 
             case "statusOfPlayer":
                 // Status logic here
-                commandSender.sendMessage("List the status of a player in the custom whitelist");
-                
                 // Get the player name from the args
                 playerName = args[1];
                 
@@ -254,8 +285,6 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 
             case "updatePlayerStatus":
                 // Update player logic here
-                commandSender.sendMessage("Update the status of a player in the custom whitelist");
-                
                 // Get the player name from the args
                 String playerNameToUpdate = args[1];
                 
