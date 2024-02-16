@@ -8,6 +8,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.apache.commons.lang3.EnumUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -15,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.sh0tix.customwhitelistv2.handlers.PasswordHandler;
 import org.sh0tix.customwhitelistv2.handlers.PlayerStatusHandler;
+import org.sh0tix.customwhitelistv2.handlers.SendMessageToPlayer;
 import org.sh0tix.customwhitelistv2.handlers.WhitelistHandler;
 import org.sh0tix.customwhitelistv2.whitelist.CWV2Player;
 
@@ -31,16 +33,17 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
     }
     
     private enum AllCommands {
-        ENABLE_OR_DISABLE_SUB_COMMAND,
-        ADD_PLAYER,
-        REMOVE_PLAYER,
-        LIST_PLAYERS,
-        STATUS_OF_PLAYER,
-        UPDATE_PLAYER_STATUS,
-        UPDATE_PASSWORD,
-        CHECK_PASSWORD,
-        CHECK_LOGIN_FUNCTIONALITY,
-        HELP
+        enableOrDisableSubCommand,
+        listAllActivatedSubCommands,
+        addPlayer,
+        removePlayer,
+        listPlayers,
+        statusOfPlayer,
+        updatePlayerStatus,
+        updatePassword,
+        checkPassword,
+        checkLoginFunctionality,
+        help
     }
     
     private final HashMap<AllCommands, CommandStatus> commandStatusHashMap = new HashMap<>();
@@ -52,16 +55,17 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
     }
     
     private void initialiseCommandMapping() {
-        commandDescriptionHashMap.put("enableOrDisableSubCommand", AllCommands.ENABLE_OR_DISABLE_SUB_COMMAND);
-        commandDescriptionHashMap.put("addPlayer", AllCommands.ADD_PLAYER);
-        commandDescriptionHashMap.put("removePlayer", AllCommands.REMOVE_PLAYER);
-        commandDescriptionHashMap.put("listPlayers", AllCommands.LIST_PLAYERS);
-        commandDescriptionHashMap.put("statusOfPlayer", AllCommands.STATUS_OF_PLAYER);
-        commandDescriptionHashMap.put("updatePlayerStatus", AllCommands.UPDATE_PLAYER_STATUS);
-        commandDescriptionHashMap.put("updatePassword", AllCommands.UPDATE_PASSWORD);
-        commandDescriptionHashMap.put("checkPassword", AllCommands.CHECK_PASSWORD);
-        commandDescriptionHashMap.put("checkLoginFunctionality", AllCommands.CHECK_LOGIN_FUNCTIONALITY);
-        commandDescriptionHashMap.put("help", AllCommands.HELP);
+        commandDescriptionHashMap.put("enableOrDisableSubCommand", AllCommands.enableOrDisableSubCommand);
+        commandDescriptionHashMap.put("listAllActivatedSubCommands", AllCommands.listAllActivatedSubCommands);
+        commandDescriptionHashMap.put("addPlayer", AllCommands.addPlayer);
+        commandDescriptionHashMap.put("removePlayer", AllCommands.removePlayer);
+        commandDescriptionHashMap.put("listPlayers", AllCommands.listPlayers);
+        commandDescriptionHashMap.put("statusOfPlayer", AllCommands.statusOfPlayer);
+        commandDescriptionHashMap.put("updatePlayerStatus", AllCommands.updatePlayerStatus);
+        commandDescriptionHashMap.put("updatePassword", AllCommands.updatePassword);
+        commandDescriptionHashMap.put("checkPassword", AllCommands.checkPassword);
+        commandDescriptionHashMap.put("checkLoginFunctionality", AllCommands.checkLoginFunctionality);
+        commandDescriptionHashMap.put("help", AllCommands.help);
     }
     
     private void initialiseCommandStatus() {
@@ -70,10 +74,11 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
         }
         
         // Set the commands that are active to active
-        commandStatusHashMap.put(AllCommands.UPDATE_PLAYER_STATUS, CommandStatus.ACTIVE);
-        commandStatusHashMap.put(AllCommands.REMOVE_PLAYER, CommandStatus.ACTIVE);
-        commandStatusHashMap.put(AllCommands.UPDATE_PASSWORD, CommandStatus.ACTIVE);
-        commandStatusHashMap.put(AllCommands.CHECK_PASSWORD, CommandStatus.ACTIVE);
+        commandStatusHashMap.put(AllCommands.statusOfPlayer, CommandStatus.ACTIVE);
+        commandStatusHashMap.put(AllCommands.updatePlayerStatus, CommandStatus.ACTIVE);
+        commandStatusHashMap.put(AllCommands.removePlayer, CommandStatus.ACTIVE);
+        commandStatusHashMap.put(AllCommands.updatePassword, CommandStatus.ACTIVE);
+        commandStatusHashMap.put(AllCommands.checkPassword, CommandStatus.ACTIVE);
     }
     
     private void setCommandStatus(AllCommands command, CommandStatus status) {
@@ -98,6 +103,8 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
             return true;
         }
 
+        
+        
         switch (subcommand) {
             case "enableOrDisableASubCommand":
                 // Enable logic here
@@ -114,7 +121,7 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 }
                 
                 // Check if the enableOrDisable is a valid status
-                if (!enableOrDisable.equalsIgnoreCase("true") && !enableOrDisable.equalsIgnoreCase("false")) {
+                if (!enableOrDisable.equalsIgnoreCase("enable") && !enableOrDisable.equalsIgnoreCase("disable")) {
                     commandSender.sendMessage("Unknown status");
                     return true;
                 }
@@ -123,7 +130,7 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 AllCommands subCommandAsEnum = EnumUtils.getEnum(AllCommands.class, subCommandToEnableOrDisable);
                 
                 // Set the status of the sub command
-                if (enableOrDisable.equalsIgnoreCase("true")) {
+                if (enableOrDisable.equalsIgnoreCase("enable")) {
                     setCommandStatus(subCommandAsEnum, CommandStatus.ACTIVE);
                     commandSender.sendMessage("Enabled the subcommand");
                 } else {
@@ -132,11 +139,37 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 }
                 
                 break;
-            
+
+                
+                
+            case "listAllActivatedSubCommands":
+                // List logic here
+                SendMessageToPlayer message = new SendMessageToPlayer();
+                message.addPartToMessage("The following subcommands are active:\n", Color.YELLOW);
+                for (AllCommands commandEnum : AllCommands.values()) {
+                    if (commandStatusHashMap.get(commandEnum) == CommandStatus.ACTIVE) {
+                        message.addPartToMessage(commandEnum.toString() + "\n", Color.GREEN);
+                    }
+                }
+                message.addPartToMessage("The following subcommands are inactive: ", Color.YELLOW);
+                for (AllCommands commandEnum : AllCommands.values()) {
+                    if (commandStatusHashMap.get(commandEnum) == CommandStatus.INACTIVE) {
+                        message.addPartToMessage(commandEnum.toString() + "\n", Color.RED);
+                    }
+                }
+                message.addPartToMessage("If you want to enable or disable a subcommand, use the command /customWhitelistV2 enableOrDisableASubCommand <subcommand> <enable/disable>", Color.YELLOW);
+                commandSender.sendMessage(message.getMessage());
+                
+                break;
+               
+                
+                
             case "addPlayer":
                 // Add logic here
                 commandSender.sendMessage("Added a player to the custom whitelist list");
                 break;
+                
+                
                 
             case "removePlayer":
                 // Remove logic here
@@ -182,16 +215,43 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                     player.sendMessage(kickMessage);
                 }
                 break;
+                
+                
+                
             case "listPlayers":
                 // List logic here
                 commandSender.sendMessage("Listed the players in the custom whitelist");
                 break;
 
+                
+                
             case "statusOfPlayer":
                 // Status logic here
                 commandSender.sendMessage("List the status of a player in the custom whitelist");
+                
+                // Get the player name from the args
+                playerName = args[1];
+                
+                // Get the player UUID from the player name
+                playerUuid = PlayerStatusHandler.getPlayerUuidFromName(playerName);
+                
+                // If the playerUuid is null, give the player a message that the player has not joined the server yet
+                if (playerUuid == null) {
+                    commandSender.sendMessage(Component.text("§cThe player §a" + playerName + "§c has not joined the server yet"));
+                    return true;
+                }
+                
+                // Get the player by its UUID
+                CWV2Player playerToCheckStatus = PlayerStatusHandler.FindPlayerByUUID(playerUuid);
+                
+                // Send the command sender a message with the status of the player
+                assert playerToCheckStatus != null;
+                commandSender.sendMessage(Component.text("§aThe status of the player §c" + playerName + "§a is §c" + playerToCheckStatus.getStatus()));
+                
                 break;
 
+                
+                
             case "updatePlayerStatus":
                 // Update player logic here
                 commandSender.sendMessage("Update the status of a player in the custom whitelist");
@@ -267,6 +327,8 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 
                 break;
 
+                
+                
             case "updatePassword":
                 // Update password logic here
                 commandSender.sendMessage("Update the join password for the custom whitelist");
@@ -279,6 +341,8 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 }
                 break;
 
+                
+                
             case "checkPassword":
                 // Help logic here
                 commandSender.sendMessage("Check the password");
@@ -291,15 +355,21 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 }
                 break;
                 
+                
+                
             case "checkLoginFunctionality":
                 // The same as the login command. This is just for testing purposes to check if the password is correct and to check if the user can login
                 commandSender.sendMessage("Check the login functionality");
                 break;
 
+                
+                
             case "help":
                 // Help logic here
                 commandSender.sendMessage("Help for the plugin");
                 break;
+                
+                
                 
             default:
                 commandSender.sendMessage("The subcommand + " + subcommand + " is not valid");
