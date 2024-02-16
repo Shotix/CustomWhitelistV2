@@ -13,7 +13,7 @@ public class CustomWhitelistV2TabCompleter implements TabCompleter {
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String strings, @NotNull String[] args) {
         if (command.getName().equalsIgnoreCase("customWhitelistV2") && args.length == 1) {
-            return Arrays.asList("enableOrDisableASubCommand", "addPlayer", "removePlayer", "listPlayers", "statusOfPlayer", "updatePlayerStatus", "updatePassword", "checkPassword", "checkLoginFunctionality", "help");
+            return Arrays.asList("enableOrDisableASubCommand", "listAllActivatedSubCommands", "addPlayer", "removePlayer", "listPlayers", "statusOfPlayer", "updatePlayerStatus", "updatePassword", "checkPassword", "checkLoginFunctionality", "help");
         }
 
         // If the player chooses the sub command "updatePlayerStatus", we want to provide the player with the following options:
@@ -40,9 +40,9 @@ public class CustomWhitelistV2TabCompleter implements TabCompleter {
         //        CHECK_LOGIN_FUNCTIONALITY,
         //        HELP
         if (command.getName().equalsIgnoreCase("customWhitelistV2") && args.length == 2 && args[0].equalsIgnoreCase("enableOrDisableASubCommand")) {
-            return Arrays.asList("ADD_PLAYER", "REMOVE_PLAYER", "LIST_PLAYERS", "STATUS_OF_PLAYER", "UPDATE_PLAYER_STATUS", "UPDATE_PASSWORD", "CHECK_PASSWORD", "CHECK_LOGIN_FUNCTIONALITY", "HELP");
+            return Arrays.asList("addPlayer", "removePlayer", "listPlayers", "statusOfPlayer", "updatePlayerStatus", "updatePassword", "checkPassword", "checkLoginFunctionality", "help");
         } else if (command.getName().equalsIgnoreCase("customWhitelistV2") && args.length == 3 && args[0].equalsIgnoreCase("enableOrDisableASubCommand")) {
-            return Arrays.asList("true", "false");
+            return Arrays.asList("enable", "disable");
         }
         
         return null;
