@@ -1,5 +1,7 @@
 package org.sh0tix.customwhitelistv2.whitelist;
 
+import net.kyori.adventure.text.Component;
+
 import java.util.Date;
 
 public class CWV2Player {
@@ -15,6 +17,62 @@ public class CWV2Player {
         UNKNOWN
     }
     
+    private static class TempBannedOrKicked {
+        Date dateOfBanOrKick;
+        Date dateOfUnbanOrUnkick;
+        Component reason;
+        int numberOfTimesBannedOrKicked;
+        Date lastTimeBannedOrKicked;
+        
+        public TempBannedOrKicked() {
+            this.dateOfBanOrKick = null;
+            this.dateOfUnbanOrUnkick = null;
+            this.reason = null;
+            this.numberOfTimesBannedOrKicked = 0;
+            this.lastTimeBannedOrKicked = null;
+        }
+
+        public Date getDateOfBanOrKick() {
+            return dateOfBanOrKick;
+        }
+
+        public void setDateOfBanOrKick(Date dateOfBanOrKick) {
+            this.dateOfBanOrKick = dateOfBanOrKick;
+        }
+
+        public Date getDateOfUnbanOrUnkick() {
+            return dateOfUnbanOrUnkick;
+        }
+
+        public void setDateOfUnbanOrUnkick(Date dateOfUnbanOrUnkick) {
+            this.dateOfUnbanOrUnkick = dateOfUnbanOrUnkick;
+        }
+
+        public Component getReason() {
+            return reason;
+        }
+
+        public void setReason(Component reason) {
+            this.reason = reason;
+        }
+
+        public int getNumberOfTimesBannedOrKicked() {
+            return numberOfTimesBannedOrKicked;
+        }
+
+        public void setNumberOfTimesBannedOrKicked(int numberOfTimesBannedOrKicked) {
+            this.numberOfTimesBannedOrKicked = numberOfTimesBannedOrKicked;
+        }
+
+        public Date getLastTimeBannedOrKicked() {
+            return lastTimeBannedOrKicked;
+        }
+
+        public void setLastTimeBannedOrKicked(Date lastTimeBannedOrKicked) {
+            this.lastTimeBannedOrKicked = lastTimeBannedOrKicked;
+        }
+    }
+    
     String uuid;
     String username;
     Status status;
@@ -24,6 +82,7 @@ public class CWV2Player {
     int numberOfTimesJoined;
     
     int numberOfWrongPasswordsEntered;
+    TempBannedOrKicked tempBannedOrKicked;
 
     public CWV2Player(String uuid, String username) {
         this.uuid = uuid;
@@ -32,6 +91,7 @@ public class CWV2Player {
         this.lastUpdated = getUpdatedTime();
         this.numberOfTimesJoined = 0;
         this.numberOfWrongPasswordsEntered = 0;
+        this.tempBannedOrKicked = null;
     }
 
     public CWV2Player(String uuid, String username, int numberOfTimesJoined) {
@@ -41,6 +101,58 @@ public class CWV2Player {
         this.lastUpdated = getUpdatedTime();
         this.numberOfTimesJoined = numberOfTimesJoined;
         this.numberOfWrongPasswordsEntered = 0;
+        this.tempBannedOrKicked = null;
+    }
+    
+    private void initTempBannedOrKicked() {
+        this.tempBannedOrKicked = new TempBannedOrKicked();
+    }
+    
+    public Date getDateOfBanOrKick() {
+        if (this.tempBannedOrKicked == null) {
+            return null;
+        }
+        return this.tempBannedOrKicked.getDateOfBanOrKick();
+    }
+    
+    public Date getDateOfUnbanOrUnkick() {
+        if (this.tempBannedOrKicked == null) {
+            return null;
+        }
+        return this.tempBannedOrKicked.getDateOfUnbanOrUnkick();
+    }
+    
+    public Component getReason() {
+        if (this.tempBannedOrKicked == null) {
+            return null;
+        }
+        return this.tempBannedOrKicked.getReason();
+    }
+    
+    public int getNumberOfTimesBannedOrKicked() {
+        if (this.tempBannedOrKicked == null) {
+            return 0;
+        }
+        return this.tempBannedOrKicked.getNumberOfTimesBannedOrKicked();
+    }
+    
+    public Date getLastTimeBannedOrKicked() {
+        if (this.tempBannedOrKicked == null) {
+            return null;
+        }
+        return this.tempBannedOrKicked.getLastTimeBannedOrKicked();
+    }
+    
+    public void setTempBannedOrKicked(Date dateOfUnbanOrUnkick, Component reason) {
+        if (this.tempBannedOrKicked == null) {
+            initTempBannedOrKicked();
+        }
+        
+        this.tempBannedOrKicked.setDateOfBanOrKick(getUpdatedTime());
+        this.tempBannedOrKicked.setDateOfUnbanOrUnkick(dateOfUnbanOrUnkick);
+        this.tempBannedOrKicked.setReason(reason);
+        this.tempBannedOrKicked.setNumberOfTimesBannedOrKicked(this.tempBannedOrKicked.getNumberOfTimesBannedOrKicked() + 1);
+        this.tempBannedOrKicked.setLastTimeBannedOrKicked(getUpdatedTime());
     }
 
     public static Date getUpdatedTime() {

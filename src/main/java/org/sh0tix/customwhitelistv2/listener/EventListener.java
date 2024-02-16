@@ -21,6 +21,8 @@ import org.sh0tix.customwhitelistv2.handlers.SendMessageToPlayer;
 import org.sh0tix.customwhitelistv2.handlers.WhitelistHandler;
 import org.sh0tix.customwhitelistv2.whitelist.CWV2Player;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -65,6 +67,22 @@ public class EventListener implements Listener {
         // Update the number of times the player has joined the server
         assert joinedPlayer != null;
         
+        
+        // Check if the user has a status of TEMP_BANNED or TEMP_KICKED and if the time has passed
+        if (joinedPlayer.getStatus() == CWV2Player.Status.TEMP_BANNED) {
+            // Check if the time has passed
+            if (PlayerStatusHandler.getTempBanOrTempKickExpiryDate(joinedPlayer).before(new Date())) {
+                // Time has passed. Set the status to NOT_WHITELISTED
+                joinedPlayer.setStatus(CWV2Player.Status.NOT_WHITELISTED);
+                PlayerStatusHandler.updatePlayerStatus(joinedPlayer.getUuid(), CWV2Player.Status.NOT_WHITELISTED);
+            }
+        } else if (joinedPlayer.getStatus() == CWV2Player.Status.TEMP_KICKED) {
+            if (PlayerStatusHandler.getTempBanOrTempKickExpiryDate(joinedPlayer).before(new Date())) {
+                // Time has passed. Set the status to WHITELISTED
+                joinedPlayer.setStatus(CWV2Player.Status.NOT_WHITELISTED);
+                PlayerStatusHandler.updatePlayerStatus(joinedPlayer.getUuid(), CWV2Player.Status.WHITELISTED);
+            }
+        }
         
         
         PlayerStatusHandler.updateNumberOfTimesJoined(joinedPlayer.getUuid());
@@ -129,8 +147,7 @@ public class EventListener implements Listener {
                 playerJoinEvent.getPlayer().sendMessage(message.getMessage());
             }
             case BANNED -> {
-                // Player is banned. 
-                
+                // Player is banned. This should be handled by the server and the ban list.
             }
             case KICKED -> {
                 // Player status is kicked. 
@@ -138,10 +155,36 @@ public class EventListener implements Listener {
             }
             case TEMP_BANNED -> {
                 // Player is temporarily banned. Kick them from the server and tell them when they can join again
+                // Difference between TEMP_BANNED and TEMP_KICKED is that TEMP_BANNED is a ban and the player is not whitelisted, after the time has passed and has to input the password again
+
+                // Make sure the user is not able to see and move
+                WhitelistHandler.disablePlayerMovementAndSight(playerJoinEvent.getPlayer());
                 
+                // Get the date when the ban expires
+                Date banExpiryDate = PlayerStatusHandler.getTempBanOrTempKickExpiryDate(joinedPlayer);
+
+                // Create a SimpleDateFormat object with the desired format
+                SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy - HH:mm");
+
+                // Format the ban expiry date into a string
+                String formattedBanExpiryDate = sdf.format(banExpiryDate);
+                
+                // Generate kick message
+                Component kickMessage = Component.text()
+                        .append(Component.text("You have been temporarily banned from the server.\n", NamedTextColor.RED, TextDecoration.BOLD))
+                        .append(Component.text("Reason: ", NamedTextColor.RED, TextDecoration.BOLD))
+                        .append(Component.text(PlayerStatusHandler.getTempBanOrTempKickMessage(joinedPlayer) + "\n", NamedTextColor.WHITE))
+                        .append(Component.text("You can join the server again on ", NamedTextColor.RED, TextDecoration.BOLD))
+                        .append(Component.text(formattedBanExpiryDate, NamedTextColor.WHITE, TextDecoration.BOLD))
+                        .append(Component.text("\nIf you think this is a mistake, please contact a moderator or administrator", NamedTextColor.RED, TextDecoration.BOLD))
+                        .build();
+                
+                // Kick the player again with the kick message
+                playerJoinEvent.getPlayer().kick(kickMessage);
             }
             case TEMP_KICKED -> {
-                // Player is temporarily kicked. Kick them from the server and tell them when they can join again
+                // Player is temporarily kicked. Kick them from the server and tell them when they can join again. 
+                // Difference between TEMP_BANNED and TEMP_KICKED is that TEMP_KICKED is not a ban, but a kick and the player is still whitelisted, after the time has passed
                 
             }
             
