@@ -36,7 +36,7 @@ Bug reports and feature requests are welcome. Please open an issue on GitHub if 
 
 ## License
 
-[Your License]
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
 
 ## Contact
 
