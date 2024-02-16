@@ -8,12 +8,18 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CustomWhitelistV2TabCompleter implements TabCompleter {
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String strings, @NotNull String[] args) {
-        if (command.getName().equalsIgnoreCase("customWhitelistV2") && args.length == 1) {
-            return Arrays.asList("enableOrDisableASubCommand", "listAllActivatedSubCommands", "addPlayer", "removePlayer", "listPlayers", "statusOfPlayer", "updatePlayerStatus", "updatePassword", "checkPassword", "checkLoginFunctionality", "help");
+        if ((command.getName().equalsIgnoreCase("customWhitelistV2") || command.getName().equalsIgnoreCase("cwv2")) && args.length == 1) {
+            String input = args[0].toLowerCase();
+            List<String> allSubCommands = Arrays.asList("enableOrDisableASubCommand", "listAllActivatedSubCommands", "addPlayer", "removePlayer", "listPlayers", "statusOfPlayer", "updatePlayerStatus", "updatePassword", "checkPassword", "help");
+            allSubCommands.sort(String::compareToIgnoreCase);
+            return allSubCommands.stream()
+                    .filter(subCommand -> subCommand.toLowerCase().startsWith(input))
+                    .collect(Collectors.toList());
         }
 
         // If the player chooses the sub command "updatePlayerStatus", we want to provide the player with the following options:
@@ -25,8 +31,13 @@ public class CustomWhitelistV2TabCompleter implements TabCompleter {
         //        TEMP_KICKED,
         //        REMOVED,
         //        UNKNOWN
-        if (command.getName().equalsIgnoreCase("customWhitelistV2") && args.length == 3 && args[0].equalsIgnoreCase("updatePlayerStatus")) {
-            return Arrays.asList("WHITELISTED", "NOT_WHITELISTED", "BANNED", "KICKED", "TEMP_BANNED", "TEMP_KICKED", "REMOVED", "UNKNOWN");
+        if ((command.getName().equalsIgnoreCase("customWhitelistV2") || command.getName().equalsIgnoreCase("cwv2")) && args.length == 3 && args[0].equalsIgnoreCase("updatePlayerStatus")) {
+            String input = args[2].toLowerCase();
+            List<String> allStatuses = Arrays.asList("WHITELISTED", "NOT_WHITELISTED", "BANNED", "KICKED", "TEMP_BANNED", "TEMP_KICKED", "REMOVED", "UNKNOWN");
+            allStatuses.sort(String::compareToIgnoreCase);
+            return allStatuses.stream()
+                    .filter(status -> status.toLowerCase().startsWith(input))
+                    .collect(Collectors.toList());
         }
         
         // If the player wants to enable or disable a sub command, we want to provide the player with the following options:
@@ -39,12 +50,21 @@ public class CustomWhitelistV2TabCompleter implements TabCompleter {
         //        CHECK_PASSWORD,
         //        CHECK_LOGIN_FUNCTIONALITY,
         //        HELP
-        if (command.getName().equalsIgnoreCase("customWhitelistV2") && args.length == 2 && args[0].equalsIgnoreCase("enableOrDisableASubCommand")) {
-            return Arrays.asList("addPlayer", "removePlayer", "listPlayers", "statusOfPlayer", "updatePlayerStatus", "updatePassword", "checkPassword", "checkLoginFunctionality", "help");
+        if ((command.getName().equalsIgnoreCase("customWhitelistV2") || command.getName().equalsIgnoreCase("cwv2")) && args.length == 2 && args[0].equalsIgnoreCase("enableOrDisableASubCommand")) {
+            String input = args[1].toLowerCase();
+            List<String> allSubCommands = Arrays.asList("addPlayer", "removePlayer", "listPlayers", "statusOfPlayer", "updatePlayerStatus", "updatePassword", "checkPassword", "checkLoginFunctionality", "help");
+            allSubCommands.sort(String::compareToIgnoreCase);
+            return allSubCommands.stream()
+                    .filter(subCommand -> subCommand.toLowerCase().startsWith(input))
+                    .collect(Collectors.toList());
         } else if (command.getName().equalsIgnoreCase("customWhitelistV2") && args.length == 3 && args[0].equalsIgnoreCase("enableOrDisableASubCommand")) {
-            return Arrays.asList("enable", "disable");
+            String input = args[2].toLowerCase();
+            List<String> allOptions = Arrays.asList("enable", "disable");
+            allOptions.sort(String::compareToIgnoreCase);
+            return allOptions.stream()
+                    .filter(option -> option.toLowerCase().startsWith(input))
+                    .collect(Collectors.toList());
         }
-        
         return null;
     }
 }
