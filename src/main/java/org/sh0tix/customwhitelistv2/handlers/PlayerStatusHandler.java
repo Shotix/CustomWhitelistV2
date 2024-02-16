@@ -3,6 +3,8 @@ package org.sh0tix.customwhitelistv2.handlers;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import net.kyori.adventure.text.Component;
+import org.sh0tix.customwhitelistv2.CustomWhitelistV2;
 import org.sh0tix.customwhitelistv2.whitelist.CWV2Player;
 
 import java.io.*;
@@ -259,6 +261,10 @@ public class PlayerStatusHandler {
         }
     }
     
+    /**
+     * Get all whitelisted players from the JSON file
+     * @return A list of all whitelisted players
+     */
     public static String getPlayerUuidFromName(String name) {
         File file = getFile();
         Gson gson = new Gson();
@@ -280,5 +286,41 @@ public class PlayerStatusHandler {
             throw new RuntimeException(e);
         }
         return null;
+    }
+    
+    public static void setPlayerIsTempBannedOrTempKicked(CWV2Player player, CWV2Player.Status status, Component reason, Date expiryDate) {
+        File file = getFile();
+        Gson gson = new Gson();
+        
+        try {
+            List<CWV2Player> players = getCwv2PlayersList(file, gson);
+            
+            // If there are no players in the JSON file, return null
+            if (players == null) {
+                return;
+            }
+            
+            for (CWV2Player p : players) {
+                if (p.getUuid().equals(player.getUuid())) {
+                    p.setStatus(status);
+                    p.setTempBannedOrKicked(expiryDate, reason);
+                }
+            }
+            
+            // Debugging console message, if debug flag is set to true
+            if (CustomWhitelistV2.debugMode) {
+                CustomWhitelistV2.getInstance().getLogger().info("Player " + player.getUsername() + " has been " + status + " until " + expiryDate);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    public static Component getTempBanOrTempKickMessage(CWV2Player player) {
+        return player.getReason();
+    }
+    
+    public static Date getTempBanOrTempKickExpiryDate(CWV2Player player) {
+        return player.getDateOfUnbanOrUnkick();
     }
 }
