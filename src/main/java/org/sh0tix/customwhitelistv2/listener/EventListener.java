@@ -63,6 +63,10 @@ public class EventListener implements Listener {
         
         // Player exists in the JSON file
         // Update the number of times the player has joined the server
+        assert joinedPlayer != null;
+        
+        
+        
         PlayerStatusHandler.updateNumberOfTimesJoined(joinedPlayer.getUuid());
 
         // Check their status and act accordingly

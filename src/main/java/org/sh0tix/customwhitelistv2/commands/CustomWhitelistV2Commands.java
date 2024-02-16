@@ -1,6 +1,7 @@
 package org.sh0tix.customwhitelistv2.commands;
 
 import com.destroystokyo.paper.utils.PaperPluginLogger;
+import com.google.gson.Gson;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -20,6 +21,10 @@ import org.sh0tix.customwhitelistv2.handlers.SendMessageToPlayer;
 import org.sh0tix.customwhitelistv2.handlers.WhitelistHandler;
 import org.sh0tix.customwhitelistv2.whitelist.CWV2Player;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -75,6 +80,7 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
         }
         
         // Set the commands that are active to active
+        commandStatusHashMap.put(AllCommands.addPlayer, CommandStatus.ACTIVE);
         commandStatusHashMap.put(AllCommands.listPlayers, CommandStatus.ACTIVE);
         commandStatusHashMap.put(AllCommands.statusOfPlayer, CommandStatus.ACTIVE);
         commandStatusHashMap.put(AllCommands.updatePlayerStatus, CommandStatus.ACTIVE);
@@ -105,8 +111,8 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
             return true;
         }
 
-        String playerName = null;
-        String playerUuid = null;
+        String playerName;
+        String playerUuid;
         
         
         switch (subcommand) {
@@ -170,7 +176,52 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 
             case "addPlayer":
                 // Add logic here
-                commandSender.sendMessage("Added a player to the custom whitelist list");
+                // Mojang API URL: https://api.ashcon.app/mojang/v2/user/<username>
+                String apiUrl = "https://api.ashcon.app/mojang/v2/user/<username>";
+                
+                // Get the player name from the args
+                playerName = args[1];
+                
+                // Join the API URL with the player name
+                apiUrl = apiUrl.replace("<username>", playerName);
+                
+                try {
+                    // Open a connection to the Mojang API
+                    URL url = new URL(apiUrl);
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    
+                    // Set the request method to GET
+                    conn.setRequestMethod("GET");
+                    
+                    // Read the response from the Mojang API
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    String line;
+                    StringBuilder response = new StringBuilder();
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+                    reader.close();
+                    
+                    // Parse the response from the Mojang API
+                    Gson gson = new Gson();
+                    CWV2Player playerToAdd = gson.fromJson(response.toString(), CWV2Player.class);
+                    
+                    // Set the rest of the playerToAdd object
+                    playerToAdd.setStatus(CWV2Player.Status.WHITELISTED);
+                    playerToAdd.setLastUpdated(CWV2Player.getUpdatedTime());
+                    playerToAdd.setNumberOfTimesJoined(0);
+                    playerToAdd.setNumberOfWrongPasswordsEntered(0);
+                    
+                    // Add the player to the custom whitelist
+                    PlayerStatusHandler.insertNewPlayer(playerToAdd);
+                    
+                    commandSender.sendMessage("Added the player " + playerName + " to the custom whitelist");
+                    
+                } catch (Exception e) {
+                    commandSender.sendMessage("Error connecting to the Mojang API");
+                    return true;
+                }
+                
                 break;
                 
                 
@@ -233,19 +284,19 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 messageToPlayer.addPartToMessage("Whitelisted players:\n", Color.GREEN);
                 for (CWV2Player whitelistedPlayer : players) {
                     if (whitelistedPlayer.getStatus() == CWV2Player.Status.WHITELISTED) {
-                        messageToPlayer.addPartToMessage(whitelistedPlayer.getName() + "\n", Color.WHITE);
+                        messageToPlayer.addPartToMessage(whitelistedPlayer.getUsername() + "\n", Color.WHITE);
                     }
                 }
                 messageToPlayer.addPartToMessage("\nNon-whitelisted players:\n", Color.YELLOW);
                 for (CWV2Player nonWhitelistedPlayer : players) {
                     if (nonWhitelistedPlayer.getStatus() == CWV2Player.Status.NOT_WHITELISTED) {
-                        messageToPlayer.addPartToMessage(nonWhitelistedPlayer.getName() + "\n", Color.WHITE);
+                        messageToPlayer.addPartToMessage(nonWhitelistedPlayer.getUsername() + "\n", Color.WHITE);
                     }
                 }
                 messageToPlayer.addPartToMessage("\nOther players:", Color.RED);
                 for (CWV2Player otherPlayer : players) {
                     if (otherPlayer.getStatus() != CWV2Player.Status.WHITELISTED && otherPlayer.getStatus() != CWV2Player.Status.NOT_WHITELISTED) {
-                        messageToPlayer.addPartToMessage("\n" + otherPlayer.getName(), Color.WHITE);
+                        messageToPlayer.addPartToMessage("\n" + otherPlayer.getUsername(), Color.WHITE);
                         messageToPlayer.addPartToMessage(" - ", Color.WHITE);
                         messageToPlayer.addPartToMessage(otherPlayer.getStatus().toString(), Color.RED);
                     }
@@ -306,6 +357,11 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 } catch (IllegalArgumentException e) {
                     commandSender.sendMessage(Component.text("§cThe status §a" + status + "§c is not valid"));
                     return true;
+                }
+                
+                // Check if the new status is the same as the old status
+                if (Objects.requireNonNull(PlayerStatusHandler.FindPlayerByUUID(playerUuidToUpdate)).getStatus() == CWV2Player.Status.valueOf(status)) {
+                    commandSender.sendMessage(Component.text("§cThe status of the player §a" + playerNameToUpdate + "§c is already §c" + status));
                 }
                 
                 // Update the status of the player
@@ -382,13 +438,6 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 } else {
                     commandSender.sendMessage("Password is incorrect");
                 }
-                break;
-                
-                
-                
-            case "checkLoginFunctionality":
-                // The same as the login command. This is just for testing purposes to check if the password is correct and to check if the user can login
-                commandSender.sendMessage("Check the login functionality");
                 break;
 
                 
