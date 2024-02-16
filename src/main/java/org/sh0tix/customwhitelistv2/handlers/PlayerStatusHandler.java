@@ -122,6 +122,17 @@ public class PlayerStatusHandler {
         bufferedReader.close();
         return players;
     }
+    
+    public static List<CWV2Player> getAllPlayers() {
+        File file = getFile();
+        Gson gson = new Gson();
+
+        try {
+            return getCwv2PlayersList(file, gson);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * Update the status of a player
