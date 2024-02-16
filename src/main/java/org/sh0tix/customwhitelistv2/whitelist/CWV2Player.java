@@ -16,7 +16,7 @@ public class CWV2Player {
     }
     
     String uuid;
-    String name;
+    String username;
     Status status;
     
     Date lastUpdated;
@@ -25,25 +25,25 @@ public class CWV2Player {
     
     int numberOfWrongPasswordsEntered;
 
-    public CWV2Player(String uuid, String name) {
+    public CWV2Player(String uuid, String username) {
         this.uuid = uuid;
-        this.name = name;
+        this.username = username;
         this.status = Status.NOT_WHITELISTED;
         this.lastUpdated = getUpdatedTime();
         this.numberOfTimesJoined = 0;
         this.numberOfWrongPasswordsEntered = 0;
     }
 
-    public CWV2Player(String uuid, String name, int numberOfTimesJoined) {
+    public CWV2Player(String uuid, String username, int numberOfTimesJoined) {
         this.uuid = uuid;
-        this.name = name;
+        this.username = username;
         this.status = Status.NOT_WHITELISTED;
         this.lastUpdated = getUpdatedTime();
         this.numberOfTimesJoined = numberOfTimesJoined;
         this.numberOfWrongPasswordsEntered = 0;
     }
 
-    private static Date getUpdatedTime() {
+    public static Date getUpdatedTime() {
         return new Date(System.currentTimeMillis());
     }
 
@@ -55,12 +55,12 @@ public class CWV2Player {
         this.uuid = uuid;
     }
 
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public Status getStatus() {
