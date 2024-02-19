@@ -79,7 +79,7 @@ public class EventListener implements Listener {
         } else if (joinedPlayer.getStatus() == CWV2Player.Status.TEMP_KICKED) {
             if (PlayerStatusHandler.getTempBanOrTempKickExpiryDate(joinedPlayer).before(new Date())) {
                 // Time has passed. Set the status to WHITELISTED
-                joinedPlayer.setStatus(CWV2Player.Status.NOT_WHITELISTED);
+                joinedPlayer.setStatus(CWV2Player.Status.WHITELISTED);
                 PlayerStatusHandler.updatePlayerStatus(joinedPlayer.getUuid(), CWV2Player.Status.WHITELISTED);
             }
         }
