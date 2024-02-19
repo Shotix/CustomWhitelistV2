@@ -96,7 +96,7 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String string, @NotNull String[] args) {
         if (args.length == 0) {
-            commandSender.sendMessage("Please provide a subcommand");
+            commandSender.sendMessage("[CustomWhitelistV2] Please provide a subcommand");
             return true;
         }
 
@@ -107,7 +107,10 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
         // Check if the status of the command is active
         if (commandStatusHashMap.get(commandAsEnum) == CommandStatus.INACTIVE) {
             // Red message
-            commandSender.sendMessage(Component.text("§cThis command is currently inactive"));
+            commandSender.sendMessage(Component.text()
+                    .append(Component.text("[CustomWhitelistV2] The subcommand ", NamedTextColor.RED))
+                    .append(Component.text(subcommand, NamedTextColor.WHITE))
+                    .append(Component.text(" is currently inactive", NamedTextColor.RED)));
             return true;
         }
 
@@ -126,13 +129,13 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 
                 // Check if the sub command is a valid sub command
                 if (!EnumUtils.isValidEnum(AllCommands.class, subCommandToEnableOrDisable)) {
-                    commandSender.sendMessage("Unknown subcommand");
+                    commandSender.sendMessage("[CustomWhitelistV2] Unknown subcommand");
                     return true;
                 }
                 
                 // Check if the enableOrDisable is a valid status
                 if (!enableOrDisable.equalsIgnoreCase("enable") && !enableOrDisable.equalsIgnoreCase("disable")) {
-                    commandSender.sendMessage("Unknown status");
+                    commandSender.sendMessage("[CustomWhitelistV2] Unknown status");
                     return true;
                 }
                 
@@ -142,10 +145,10 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 // Set the status of the sub command
                 if (enableOrDisable.equalsIgnoreCase("enable")) {
                     setCommandStatus(subCommandAsEnum, CommandStatus.ACTIVE);
-                    commandSender.sendMessage("Enabled the subcommand");
+                    commandSender.sendMessage(Component.text("[CustomWhitelistV2] Enabled the subcommand", NamedTextColor.GREEN));
                 } else {
                     setCommandStatus(subCommandAsEnum, CommandStatus.INACTIVE);
-                    commandSender.sendMessage("Disabled the subcommand");
+                    commandSender.sendMessage(Component.text("[CustomWhitelistV2] Disabled the subcommand", NamedTextColor.RED));
                 }
                 
                 break;
@@ -155,13 +158,13 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
             case "listAllActivatedSubCommands":
                 // List logic here
                 SendMessageToPlayer message = new SendMessageToPlayer();
-                message.addPartToMessage("The following subcommands are active:\n", Color.YELLOW);
+                message.addPartToMessage("[CustomWhitelistV2] The following subcommands are active:\n", Color.YELLOW);
                 for (AllCommands commandEnum : AllCommands.values()) {
                     if (commandStatusHashMap.get(commandEnum) == CommandStatus.ACTIVE) {
                         message.addPartToMessage(commandEnum.toString() + "\n", Color.GREEN);
                     }
                 }
-                message.addPartToMessage("The following subcommands are inactive: ", Color.YELLOW);
+                message.addPartToMessage("[CustomWhitelistV2] The following subcommands are inactive: ", Color.YELLOW);
                 for (AllCommands commandEnum : AllCommands.values()) {
                     if (commandStatusHashMap.get(commandEnum) == CommandStatus.INACTIVE) {
                         message.addPartToMessage(commandEnum.toString() + "\n", Color.RED);
@@ -215,10 +218,10 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                     // Add the player to the custom whitelist
                     PlayerStatusHandler.insertNewPlayer(playerToAdd);
                     
-                    commandSender.sendMessage("Added the player " + playerName + " to the custom whitelist");
+                    commandSender.sendMessage(Component.text("[CustomWhitelistV2] Added the player " + playerName + " to the custom whitelist", NamedTextColor.GREEN));
                     
                 } catch (Exception e) {
-                    commandSender.sendMessage("Error connecting to the Mojang API");
+                    commandSender.sendMessage("[CustomWhitelistV2] Error connecting to the Mojang API");
                     return true;
                 }
                 
@@ -236,13 +239,19 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 
                 // If the playerUuid is null, give the player a message that the player is not found
                 if (playerUuid == null) {
-                    commandSender.sendMessage(Component.text("§cThe player §a" + playerName + "§c is not found"));
+                    commandSender.sendMessage(Component.text()
+                            .append(Component.text("[CustomWhitelistV2] The player ", NamedTextColor.RED))
+                            .append(Component.text(playerName, NamedTextColor.WHITE))
+                            .append(Component.text(" is not found", NamedTextColor.RED)));
                     return true;
                 }
 
                 PlayerStatusHandler.updatePlayerStatus(playerUuid, CWV2Player.Status.NOT_WHITELISTED);
                 
-                commandSender.sendMessage(Component.text("§aRemoved the player §c" + playerName + "§a from the custom whitelist"));
+                commandSender.sendMessage(Component.text()
+                        .append(Component.text("[CustomWhitelistV2] Removed the player ", NamedTextColor.GREEN))
+                        .append(Component.text(playerName, NamedTextColor.WHITE))
+                        .append(Component.text(" from the custom whitelist", NamedTextColor.GREEN)));
                 
                 // Check if the removed player is currently online
                 Player player = Bukkit.getPlayer(playerName);
@@ -255,7 +264,7 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                     
                     // Send the player a message that they have been removed from the whitelist and that they can no longer join the server
                     Component kickMessage = Component.text()
-                            .append(Component.text("You have been removed from the custom whitelist by a moderator. ", NamedTextColor.RED, TextDecoration.BOLD))
+                            .append(Component.text("[CustomWhitelistV2] You have been removed from the custom whitelist by a moderator. ", NamedTextColor.RED, TextDecoration.BOLD))
                             .append(Component.text("You can no longer play on the server. ", NamedTextColor.RED, TextDecoration.BOLD))
                             .append(Component.text("If you think this is a mistake, ", NamedTextColor.RED, TextDecoration.BOLD))
                             .append(Component.text("click here", NamedTextColor.BLUE, TextDecoration.UNDERLINED)
@@ -280,7 +289,7 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
 
                 // Create a new message
                 SendMessageToPlayer messageToPlayer = new SendMessageToPlayer();
-                messageToPlayer.addPartToMessage("The following players are in the custom whitelist:\n", Color.YELLOW);
+                messageToPlayer.addPartToMessage("[CustomWhitelistV2] The following players are in the custom whitelist:\n", Color.YELLOW);
                 messageToPlayer.addPartToMessage("Whitelisted players:\n", Color.GREEN);
                 for (CWV2Player whitelistedPlayer : players) {
                     if (whitelistedPlayer.getStatus() == CWV2Player.Status.WHITELISTED) {
@@ -319,7 +328,10 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 
                 // If the playerUuid is null, give the player a message that the player has not joined the server yet
                 if (playerUuid == null) {
-                    commandSender.sendMessage(Component.text("§cThe player §a" + playerName + "§c has not joined the server yet"));
+                    commandSender.sendMessage(Component.text()
+                            .append(Component.text("[CustomWhitelistV2] The player ", NamedTextColor.RED))
+                            .append(Component.text(playerName, NamedTextColor.WHITE))
+                            .append(Component.text(" has not joined the server yet", NamedTextColor.RED)));
                     return true;
                 }
                 
@@ -328,7 +340,11 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 
                 // Send the command sender a message with the status of the player
                 assert playerToCheckStatus != null;
-                commandSender.sendMessage(Component.text("§aThe status of the player §c" + playerName + "§a is §c" + playerToCheckStatus.getStatus()));
+                commandSender.sendMessage(Component.text()
+                        .append(Component.text("[CustomWhitelistV2] The status of the player ", NamedTextColor.GREEN))
+                        .append(Component.text(playerName, NamedTextColor.WHITE))
+                        .append(Component.text(" is ", NamedTextColor.GREEN))
+                        .append(Component.text(playerToCheckStatus.getStatus().toString(), NamedTextColor.WHITE)));
                 
                 break;
 
@@ -344,7 +360,10 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 
                 // If the playerUuid is null, give the player a message that the player is not found
                 if (playerUuidToUpdate == null) {
-                    commandSender.sendMessage(Component.text("§cThe player §a" + playerNameToUpdate + "§c is not found"));
+                    commandSender.sendMessage(Component.text()
+                            .append(Component.text("[CustomWhitelistV2] The player ", NamedTextColor.RED))
+                            .append(Component.text(playerNameToUpdate, NamedTextColor.WHITE))
+                            .append(Component.text(" is not found", NamedTextColor.RED)));
                     return true;
                 }
                 
@@ -355,27 +374,40 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 try {
                     CWV2Player.Status.valueOf(status);
                 } catch (IllegalArgumentException e) {
-                    commandSender.sendMessage(Component.text("§cThe status §a" + status + "§c is not valid"));
+                    commandSender.sendMessage(Component.text()
+                            .append(Component.text("[CustomWhitelistV2] The status ", NamedTextColor.RED))
+                            .append(Component.text(status, NamedTextColor.WHITE))
+                            .append(Component.text(" is not valid", NamedTextColor.RED)));
                     return true;
                 }
                 
                 // Check if the new status is the same as the old status
                 if (Objects.requireNonNull(PlayerStatusHandler.FindPlayerByUUID(playerUuidToUpdate)).getStatus() == CWV2Player.Status.valueOf(status)) {
-                    commandSender.sendMessage(Component.text("§cThe status of the player §a" + playerNameToUpdate + "§c is already §c" + status));
+                    commandSender.sendMessage(Component.text()
+                            .append(Component.text("[CustomWhitelistV2] The status of the player ", NamedTextColor.RED))
+                            .append(Component.text(playerNameToUpdate, NamedTextColor.WHITE))
+                            .append(Component.text(" is already ", NamedTextColor.RED))
+                            .append(Component.text(status, NamedTextColor.WHITE)));
                 }
                 
                 // Update the status of the player
                 PlayerStatusHandler.updatePlayerStatus(playerUuidToUpdate, CWV2Player.Status.valueOf(status));
                 
                 // Send the command sender a message that the status of the player has been updated
-                commandSender.sendMessage(Component.text("§aUpdated the status of the player §c" + playerNameToUpdate + "§a to §c" + status));
+                commandSender.sendMessage(Component.text()
+                        .append(Component.text("[CustomWhitelistV2] The status of the player ", NamedTextColor.GREEN))
+                        .append(Component.text(playerNameToUpdate, NamedTextColor.WHITE))
+                        .append(Component.text(" has been updated to ", NamedTextColor.GREEN))
+                        .append(Component.text(status, NamedTextColor.WHITE)));
                 
                 // Check if the updated player is currently online
                 Player playerOnline = Bukkit.getPlayer(playerNameToUpdate);
                 
                 if (playerOnline != null) {
                     // Send the player a message that their status has been updated
-                    playerOnline.sendMessage(Component.text("§aYour status has been updated to §c" + status));
+                    playerOnline.sendMessage(Component.text()
+                            .append(Component.text("[CustomWhitelistV2] Your status has been updated to ", NamedTextColor.GREEN))
+                            .append(Component.text(status, NamedTextColor.WHITE)));
                 }
 
                 // Handle different updated statuses
@@ -433,13 +465,14 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 
             case "updatePassword":
                 // Update password logic here
-                commandSender.sendMessage("Update the join password for the custom whitelist");
                 String newPassword = args[1];
                 boolean tryUpdatePassword = PasswordHandler.updatePassword(newPassword);
                 if (tryUpdatePassword) {
-                    commandSender.sendMessage("Password updated successfully");
+                    commandSender.sendMessage(Component.text()
+                            .append(Component.text("[CustomWhitelistV2] Updated the password", NamedTextColor.GREEN)));
                 } else {
-                    commandSender.sendMessage("Error updating the password");
+                    commandSender.sendMessage(Component.text()
+                            .append(Component.text("[CustomWhitelistV2] Error updating the password", NamedTextColor.RED)));
                 }
                 break;
 
@@ -447,13 +480,14 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 
             case "checkPassword":
                 // Help logic here
-                commandSender.sendMessage("Check the password");
                 String inputPassword = args[1];
                 boolean tryCheckPassword = PasswordHandler.checkPassword(inputPassword);
                 if (tryCheckPassword) {
-                    commandSender.sendMessage("Password is correct");
+                    commandSender.sendMessage(Component.text()
+                            .append(Component.text("[CustomWhitelistV2] Password is correct", NamedTextColor.GREEN)));
                 } else {
-                    commandSender.sendMessage("Password is incorrect");
+                    commandSender.sendMessage(Component.text()
+                            .append(Component.text("[CustomWhitelistV2] Password is incorrect", NamedTextColor.RED)));
                 }
                 break;
 
@@ -467,7 +501,9 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 
                 
             default:
-                commandSender.sendMessage("The subcommand + " + subcommand + " is not valid");
+                commandSender.sendMessage(Component.text()
+                        .append(Component.text("[CustomWhitelistV2] Unknown subcommand ", NamedTextColor.RED))
+                        .append(Component.text(subcommand, NamedTextColor.WHITE)));
                 break;
         }
 

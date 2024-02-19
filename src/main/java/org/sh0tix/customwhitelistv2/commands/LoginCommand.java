@@ -23,7 +23,7 @@ public class LoginCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String string, @NotNull String[] args) {
         if (!(commandSender instanceof Player)) {
-            commandSender.sendMessage("This command can only be executed by a player");
+            commandSender.sendMessage("[CustomWhitelistV2] This command can only be executed by a player");
             return true;
         }
         
@@ -31,7 +31,7 @@ public class LoginCommand implements CommandExecutor {
         CWV2Player cwv2Player = PlayerStatusHandler.FindPlayerByUUID(String.valueOf(player.getUniqueId()));
         
         if (args.length == 0) {
-            commandSender.sendMessage("Please provide a password");
+            commandSender.sendMessage("[CustomWhitelistV2] Please provide a password");
             return true;
         }
         
@@ -39,7 +39,7 @@ public class LoginCommand implements CommandExecutor {
 
         if (PasswordHandler.checkPassword(password)) {
             // Password is correct. The user is allowed to play on the server
-            commandSender.sendMessage("Password is correct");
+            commandSender.sendMessage("[CustomWhitelistV2] Password is correct");
             
             // Update the status of the player in the JSON file
             assert cwv2Player != null;
@@ -54,7 +54,7 @@ public class LoginCommand implements CommandExecutor {
                 luckPerms.getUserManager().saveUser(user);
             }
             // Broadcast a message to all players that the player has joined the server and is now whitelisted
-            Component message = Component.text("§a" + player.getName() + " has joined the server and is now whitelisted!");
+            Component message = Component.text("§a[CustomWhitelistV2] " + player.getName() + " has joined the server and is now whitelisted!");
             
             Bukkit.getServer().broadcast(message);
             
@@ -66,7 +66,7 @@ public class LoginCommand implements CommandExecutor {
             WhitelistHandler.enablePlayerMovementAndSight(player);
         } else {
             // Password in incorrect.
-            commandSender.sendMessage("Password is incorrect");
+            commandSender.sendMessage("[CustomWhitelistV2] Password is incorrect");
             
             // Update the number of wrong passwords entered
             assert cwv2Player != null;

@@ -1,6 +1,7 @@
 package org.sh0tix.customwhitelistv2.listener;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,8 +20,14 @@ public class ChatListener implements Listener {
             event.setCancelled(true);
             Bukkit.getScheduler().runTask(Objects.requireNonNull(
                     Bukkit.getPluginManager().getPlugin("CustomWhitelistV2")), () -> 
-                    event.getPlayer().sendMessage("You are not whitelisted! Please login using /login <password> to chat!")
-            );
+                    event.getPlayer().sendMessage(Component.text()
+                            .append(Component.text("[CustomWhitelistV2] ", net.kyori.adventure.text.format.NamedTextColor.GREEN))
+                            .append(Component.text("You are not whitelisted on this server", net.kyori.adventure.text.format.NamedTextColor.YELLOW))
+                            .append(Component.text(" and therefore not allowed to \n", net.kyori.adventure.text.format.NamedTextColor.YELLOW))
+                            .append(Component.text("Please login with the command ", net.kyori.adventure.text.format.NamedTextColor.YELLOW))
+                            .append(Component.text("/login <password>", net.kyori.adventure.text.format.NamedTextColor.AQUA))
+                            .append(Component.text(" to play on this server", net.kyori.adventure.text.format.NamedTextColor.YELLOW))
+            ));
         }
     }
 }

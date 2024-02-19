@@ -97,7 +97,7 @@ public class EventListener implements Listener {
                 *   "You have joined the server <number of times joined> times"
                  */
                 SendMessageToPlayer message = new SendMessageToPlayer();
-                message.addPartToMessage("Welcome back to the server " + playerJoinEvent.getPlayer().getName(), Color.YELLOW);
+                message.addPartToMessage("[CustomWhitelistV2] Welcome back to the server " + playerJoinEvent.getPlayer().getName(), Color.YELLOW);
                 
                 // Tell the user they are welcome back to the server
                 playerJoinEvent.getPlayer().sendMessage(message.getMessage());
@@ -108,13 +108,13 @@ public class EventListener implements Listener {
                 if (numberOfTimesJoined < 1) {
                     joinedPlayer.setNumberOfTimesJoined(1);
                     joinedMessage = Component.text(
-                            "§a" + playerJoinEvent.getPlayer().getName() + " just joined the server. He has joined the server " +
+                            "§a[CustomWhitelistV2] " + playerJoinEvent.getPlayer().getName() + " just joined the server. He has joined the server " +
                                     joinedPlayer.getNumberOfTimesJoined() + " time"
                     );
                 } else {
                     // Broadcast to the server that the player has joined. Also tell everyone how many times the player has joined the server
                     joinedMessage = Component.text(
-                            "§a" + playerJoinEvent.getPlayer().getName() + " just joined the server. He has joined the server " +
+                            "§a[CustomWhitelistV2] " + playerJoinEvent.getPlayer().getName() + " just joined the server. He has joined the server " +
                                     numberOfTimesJoined + " times"
                     );
                 }
@@ -178,7 +178,7 @@ public class EventListener implements Listener {
                 
                 // Generate kick message
                 Component kickMessage = Component.text()
-                        .append(Component.text("You have been temporarily banned from the server.\n", NamedTextColor.RED, TextDecoration.BOLD))
+                        .append(Component.text("[CustomWhitelistV2] You have been temporarily banned from the server.\n", NamedTextColor.RED, TextDecoration.BOLD))
                         .append(Component.text("Reason: ", NamedTextColor.RED, TextDecoration.BOLD))
                         .append(Component.text(PlayerStatusHandler.getTempBanOrTempKickMessage(joinedPlayer) + "\n", NamedTextColor.WHITE))
                         .append(Component.text("You can join the server again on ", NamedTextColor.RED, TextDecoration.BOLD))
@@ -212,7 +212,7 @@ public class EventListener implements Listener {
                 *   "If you think this is a mistake, please contact a moderator or administrator"
                  */
                 Component kickMessage = Component.text()
-                        .append(Component.text("You have been removed from the custom whitelist by a moderator. ", NamedTextColor.RED, TextDecoration.BOLD))
+                        .append(Component.text("[CustomWhitelistV2] You have been removed from the custom whitelist by a moderator. ", NamedTextColor.RED, TextDecoration.BOLD))
                         .append(Component.text("You can no longer play on the server. ", NamedTextColor.RED, TextDecoration.BOLD))
                         .append(Component.text("If you think this is a mistake, ", NamedTextColor.RED, TextDecoration.BOLD))
                         .append(Component.text("click here", NamedTextColor.BLUE, TextDecoration.UNDERLINED)

@@ -24,7 +24,7 @@ public class DebugCommand implements CommandExecutor {
             CustomWhitelistV2.getInstance().getServer().getOnlinePlayers().stream()
                     .filter(player -> player.hasPermission("customwhitelistv2.administrator"))
                     .forEach(player -> player.sendMessage(Component.text()
-                            .append(Component.text("WARNING: DEBUG MODE ENABLED BY " + commandSender.getName(), NamedTextColor.RED)
+                            .append(Component.text("[CustomWhitelistV2] WARNING: DEBUG MODE ENABLED BY " + commandSender.getName(), NamedTextColor.RED)
                                     .decoration(TextDecoration.BOLD, true))
                     ));
             
@@ -35,7 +35,7 @@ public class DebugCommand implements CommandExecutor {
             CustomWhitelistV2.getInstance().getServer().getOnlinePlayers().stream()
                     .filter(player -> player.hasPermission("customwhitelistv2.administrator"))
                     .forEach(player -> player.sendMessage(Component.text()
-                            .append(Component.text("WARNING: DEBUG MODE DISABLED BY " + commandSender.getName(), NamedTextColor.GREEN)
+                            .append(Component.text("[CustomWhitelistV2] WARNING: DEBUG MODE DISABLED BY " + commandSender.getName(), NamedTextColor.GREEN)
                                     .decoration(TextDecoration.BOLD, true))
                     ));
             return true;

@@ -32,7 +32,7 @@ public final class CustomWhitelistV2 extends JavaPlugin {
     public void onEnable() {
         // Check if PaperMC is used 
         if (!getServer().getVersion().contains("Paper")) {
-            getLogger().severe("This plugin is designed to work with PaperMC only! Disabling CustomWhitelistV2...");
+            getLogger().severe("[CustomWhitelistV2] This plugin is designed to work with PaperMC only! Disabling CustomWhitelistV2...");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -41,12 +41,12 @@ public final class CustomWhitelistV2 extends JavaPlugin {
         if (checkForLuckPermsSetup()) return;
         
         // Send a message to the console
-        getServer().getConsoleSender().sendMessage("CustomWhitelistV2 plugin has been enabled!");
+        getServer().getConsoleSender().sendMessage("[CustomWhitelistV2] CustomWhitelistV2 plugin has been enabled!");
 
         // Send a message to all administrators
         for (Player player : getServer().getOnlinePlayers()) {
             if (player.hasPermission("customwhitelistv2.administrator")) {
-                player.sendMessage(Component.text().append(Component.text("CustomWhitelistV2 plugin has been enabled!", NamedTextColor.GREEN, TextDecoration.BOLD)));
+                player.sendMessage(Component.text().append(Component.text("[CustomWhitelistV2] CustomWhitelistV2 plugin has been enabled!", NamedTextColor.GREEN, TextDecoration.BOLD)));
             }
         }
 
@@ -69,14 +69,14 @@ public final class CustomWhitelistV2 extends JavaPlugin {
     private boolean checkForLuckPermsSetup() {
         // Check if the LuckPerms plugin is installed
         if (getServer().getPluginManager().getPlugin("LuckPerms") == null) {
-            getLogger().severe("LuckPerms plugin not found! Disabling CustomWhitelistV2...");
+            getLogger().severe("[CustomWhitelistV2] LuckPerms plugin not found! Disabling CustomWhitelistV2...");
             getServer().getPluginManager().disablePlugin(this);
             return true;
         }
 
         // Check if the LuckPerms plugin is enabled
         if (!Objects.requireNonNull(getServer().getPluginManager().getPlugin("LuckPerms")).isEnabled()) {
-            getLogger().severe("LuckPerms plugin is not enabled! Disabling CustomWhitelistV2...");
+            getLogger().severe("[CustomWhitelistV2] LuckPerms plugin is not enabled! Disabling CustomWhitelistV2...");
             getServer().getPluginManager().disablePlugin(this);
             return true;
         }
@@ -85,7 +85,7 @@ public final class CustomWhitelistV2 extends JavaPlugin {
         LuckPerms api = LuckPermsProvider.get();
         Group group = api.getGroupManager().getGroup("default");
         if (group == null) {
-            getLogger().severe("The group 'default' does not exist! Disabling CustomWhitelistV2...");
+            getLogger().severe("[CustomWhitelistV2] The group 'default' does not exist! Disabling CustomWhitelistV2...");
             getServer().getPluginManager().disablePlugin(this);
             return true;
         }
@@ -104,12 +104,12 @@ public final class CustomWhitelistV2 extends JavaPlugin {
         getServer().getScheduler().cancelTasks(this);
 
         // Send a message to the console
-        getServer().getConsoleSender().sendMessage("CustomWhitelistV2 plugin has been disabled!");
+        getServer().getConsoleSender().sendMessage("[CustomWhitelistV2] CustomWhitelistV2 plugin has been disabled!");
 
         // Send a message to all administrators
         for (Player player : getServer().getOnlinePlayers()) {
             if (player.hasPermission("customwhitelistv2.administrator")) {
-                player.sendMessage(Component.text().append(Component.text("CustomWhitelistV2 plugin has been disabled!", NamedTextColor.RED, TextDecoration.BOLD)));
+                player.sendMessage(Component.text().append(Component.text("[CustomWhitelistV2] CustomWhitelistV2 plugin has been disabled!", NamedTextColor.RED, TextDecoration.BOLD)));
             }
         }
 
