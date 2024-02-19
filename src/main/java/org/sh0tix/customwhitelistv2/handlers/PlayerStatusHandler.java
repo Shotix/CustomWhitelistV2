@@ -292,6 +292,10 @@ public class PlayerStatusHandler {
         return null;
     }
     
+    /**
+     * Get all whitelisted players from the JSON file
+     * @return A list of all whitelisted players
+     */
     private static Date generateExpiryDateFromTimeString(String timeString) {
         // The input string will be build like this:
         // Number + h, m, w, d, y
@@ -314,6 +318,13 @@ public class PlayerStatusHandler {
         }
     }
 
+    /**
+     * Generate a reason component from a string
+     * @param newStatus The new status of the player
+     * @param reasonString The reason for the new status
+     * @param expiryDate The date the player can rejoin the server
+     * @return A reason component
+     */
     private static Component generateReasonComponentFromString(CWV2Player.Status newStatus, String reasonString, Date expiryDate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime localDateTime = expiryDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
@@ -332,6 +343,13 @@ public class PlayerStatusHandler {
                 .build();
     }
     
+    /**
+     * Set the status of a player to temp banned or temp kicked
+     * @param player The player to set the status of
+     * @param status The new status of the player
+     * @param reasonString The reason for the new status
+     * @param timeString The time the player is temp banned or temp kicked
+     */
     public static void setPlayerIsTempBannedOrTempKicked(CWV2Player player, CWV2Player.Status status, String reasonString, String timeString) {
         File file = getFile();
         
@@ -362,10 +380,20 @@ public class PlayerStatusHandler {
         }
     }
     
+    /**
+     * Get the reason for a player being temp banned or temp kicked
+     * @param player The player to get the reason for
+     * @return The reason for the player being temp banned or temp kicked
+     */
     public static Component getTempBanOrTempKickMessage(CWV2Player player) {
         return player.getReason();
     }
     
+    /**
+     * Get the number of times a player has been temp banned or temp kicked
+     * @param player The player to get the number of times temp banned or temp kicked
+     * @return The number of times the player has been temp banned or temp kicked
+     */
     public static Date getTempBanOrTempKickExpiryDate(CWV2Player player) {
         return player.getDateOfUnbanOrUnkick();
     }
