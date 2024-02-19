@@ -11,7 +11,6 @@ import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.types.PermissionNode;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -23,9 +22,7 @@ import org.sh0tix.customwhitelistv2.whitelist.CWV2Player;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 public class EventListener implements Listener {
     
@@ -105,11 +102,22 @@ public class EventListener implements Listener {
                 // Tell the user they are welcome back to the server
                 playerJoinEvent.getPlayer().sendMessage(message.getMessage());
                 
-                // Broadcast to the server that the player has joined. Also tell everyone how many times the player has joined the server
-                Component joinedMessage = Component.text(
-                        "§a" + playerJoinEvent.getPlayer().getName() + " just joined the server. He has joined the server " + 
-                                joinedPlayer.getNumberOfTimesJoined() + " times"
-                );
+                // Make sure numberOfTimesJoined is not null, minimum value is 1
+                int numberOfTimesJoined = joinedPlayer.getNumberOfTimesJoined();
+                Component joinedMessage;
+                if (numberOfTimesJoined < 1) {
+                    joinedPlayer.setNumberOfTimesJoined(1);
+                    joinedMessage = Component.text(
+                            "§a" + playerJoinEvent.getPlayer().getName() + " just joined the server. He has joined the server " +
+                                    joinedPlayer.getNumberOfTimesJoined() + " time"
+                    );
+                } else {
+                    // Broadcast to the server that the player has joined. Also tell everyone how many times the player has joined the server
+                    joinedMessage = Component.text(
+                            "§a" + playerJoinEvent.getPlayer().getName() + " just joined the server. He has joined the server " +
+                                    numberOfTimesJoined + " times"
+                    );
+                }
                 
                 Bukkit.getServer().broadcast(joinedMessage);
             }
@@ -150,8 +158,7 @@ public class EventListener implements Listener {
                 // Player is banned. This should be handled by the server and the ban list.
             }
             case KICKED -> {
-                // Player status is kicked. 
-                
+                // Player status is kicked.
             }
             case TEMP_BANNED -> {
                 // Player is temporarily banned. Kick them from the server and tell them when they can join again
@@ -185,7 +192,12 @@ public class EventListener implements Listener {
             case TEMP_KICKED -> {
                 // Player is temporarily kicked. Kick them from the server and tell them when they can join again. 
                 // Difference between TEMP_BANNED and TEMP_KICKED is that TEMP_KICKED is not a ban, but a kick and the player is still whitelisted, after the time has passed
-                
+
+                // Make sure the user is not able to see and move
+                WhitelistHandler.disablePlayerMovementAndSight(playerJoinEvent.getPlayer());
+
+                // Kick the player again with the kick message
+                playerJoinEvent.getPlayer().kick(PlayerStatusHandler.getTempBanOrTempKickMessage(joinedPlayer));
             }
             
             case REMOVED -> {
