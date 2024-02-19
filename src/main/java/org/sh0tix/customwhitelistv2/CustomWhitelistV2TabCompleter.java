@@ -39,6 +39,19 @@ public class CustomWhitelistV2TabCompleter implements TabCompleter {
                     .filter(status -> status.toLowerCase().startsWith(input))
                     .collect(Collectors.toList());
         }
+
+        // If the player chooses the sub command "TEMP_BANNED" or "TEMP_KICKED", the player should now input a time period for the ban or kick.
+        // This should be a number followed by a time unit (s, m, h, d, w, m, y).
+        // The user should get a help message: <time period> (e.g. 1d, 2w, 3m, 4y)
+        if ((command.getName().equalsIgnoreCase("customWhitelistV2") || command.getName().equalsIgnoreCase("cwv2")) && args.length == 4 && (args[2].equalsIgnoreCase("TEMP_BANNED") || args[2].equalsIgnoreCase("TEMP_KICKED"))) {
+            return List.of("<time period> (e.g. 1d, 2w, 3m, 4y)");
+        }
+
+        // If the player chooses the sub command "TEMP_BANNED" or "TEMP_KICKED", the player should now input a reason for the ban or kick.
+        // The user should get the following help message: <reason>
+        if ((command.getName().equalsIgnoreCase("customWhitelistV2") || command.getName().equalsIgnoreCase("cwv2")) && args.length == 5 && (args[2].equalsIgnoreCase("TEMP_BANNED") || args[2].equalsIgnoreCase("TEMP_KICKED"))) {
+            return List.of("<reason>");
+        }
         
         // If the player wants to enable or disable a sub command, we want to provide the player with the following options:
         //        ADD_PLAYER,
