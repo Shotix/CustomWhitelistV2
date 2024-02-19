@@ -20,7 +20,7 @@ import java.util.Objects;
 
 public final class CustomWhitelistV2 extends JavaPlugin {
     
-    public static boolean debugMode = false;
+    public static boolean debugMode = true;
     
     private static CustomWhitelistV2 instance;
     
@@ -39,6 +39,16 @@ public final class CustomWhitelistV2 extends JavaPlugin {
         
         // Check if the LuckPerms plugin is installed and enabled
         if (checkForLuckPermsSetup()) return;
+        
+        // Send a message to the console
+        getServer().getConsoleSender().sendMessage("CustomWhitelistV2 plugin has been enabled!");
+
+        // Send a message to all administrators
+        for (Player player : getServer().getOnlinePlayers()) {
+            if (player.hasPermission("customwhitelistv2.administrator")) {
+                player.sendMessage(Component.text().append(Component.text("CustomWhitelistV2 plugin has been enabled!", NamedTextColor.GREEN, TextDecoration.BOLD)));
+            }
+        }
 
         // Plugin startup logic
         instance = this;
