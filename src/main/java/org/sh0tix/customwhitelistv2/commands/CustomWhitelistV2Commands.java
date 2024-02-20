@@ -3,6 +3,8 @@ package org.sh0tix.customwhitelistv2.commands;
 import com.destroystokyo.paper.utils.PaperPluginLogger;
 import com.google.gson.Gson;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentBuilder;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -76,17 +78,11 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
     
     private void initialiseCommandStatus() {
         for (AllCommands command : AllCommands.values()) {
-            commandStatusHashMap.put(command, CommandStatus.INACTIVE);
+            commandStatusHashMap.put(command, CommandStatus.ACTIVE);
         }
         
-        // Set the commands that are active to active
-        commandStatusHashMap.put(AllCommands.addPlayer, CommandStatus.ACTIVE);
-        commandStatusHashMap.put(AllCommands.listPlayers, CommandStatus.ACTIVE);
-        commandStatusHashMap.put(AllCommands.statusOfPlayer, CommandStatus.ACTIVE);
-        commandStatusHashMap.put(AllCommands.updatePlayerStatus, CommandStatus.ACTIVE);
-        commandStatusHashMap.put(AllCommands.removePlayer, CommandStatus.ACTIVE);
-        commandStatusHashMap.put(AllCommands.updatePassword, CommandStatus.ACTIVE);
-        commandStatusHashMap.put(AllCommands.checkPassword, CommandStatus.ACTIVE);
+        // Set the commands that are inactive to inactive
+        
     }
     
     private void setCommandStatus(AllCommands command, CommandStatus status) {
@@ -491,13 +487,118 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 }
                 break;
 
-                
-                
+
+
             case "help":
                 // Help logic here
-                commandSender.sendMessage("Help for the plugin");
-                break;
+                String subCommand = null;
                 
+                try {
+                    subCommand = args[1];
+                } catch (ArrayIndexOutOfBoundsException ignored) {
+                    
+                }
+
+                ComponentBuilder<TextComponent, TextComponent.Builder> helpMessage = null;
+                
+                if (subCommand == null) {
+                     helpMessage = Component.text()
+                             .append(Component.text("\n[CustomWhitelistV2] Help menu:\n", NamedTextColor.YELLOW))
+                             .append(Component.text("> ", NamedTextColor.AQUA))
+                             .append(Component.text("/customWhitelistV2 enableOrDisableASubCommand\n", NamedTextColor.GREEN))
+                             .append(Component.text("> ", NamedTextColor.AQUA))
+                             .append(Component.text("/customWhitelistV2 listAllActivatedSubCommands\n", NamedTextColor.GREEN))
+                             .append(Component.text("> ", NamedTextColor.AQUA))
+                             .append(Component.text("/customWhitelistV2 addPlayer\n", NamedTextColor.GREEN))
+                             .append(Component.text("> ", NamedTextColor.AQUA))
+                             .append(Component.text("/customWhitelistV2 removePlayer\n", NamedTextColor.GREEN))
+                             .append(Component.text("> ", NamedTextColor.AQUA))
+                             .append(Component.text("/customWhitelistV2 listPlayers\n", NamedTextColor.GREEN))
+                             .append(Component.text("> ", NamedTextColor.AQUA))
+                             .append(Component.text("/customWhitelistV2 statusOfPlayer\n", NamedTextColor.GREEN))
+                             .append(Component.text("> ", NamedTextColor.AQUA))
+                             .append(Component.text("/customWhitelistV2 updatePlayerStatus\n", NamedTextColor.GREEN))
+                             .append(Component.text("> ", NamedTextColor.AQUA))
+                             .append(Component.text("/customWhitelistV2 updatePassword\n", NamedTextColor.GREEN))
+                             .append(Component.text("> ", NamedTextColor.AQUA))
+                             .append(Component.text("/customWhitelistV2 checkPassword\n", NamedTextColor.GREEN))
+                             .append(Component.text("> ", NamedTextColor.AQUA))
+                             .append(Component.text("/customWhitelistV2 help\n", NamedTextColor.GREEN))
+                             .append(Component.text("Use /customWhitelistV2 help <subcommand> to get help with a specific subcommand", NamedTextColor.YELLOW));
+                } else {
+                    switch (subCommand) {
+                        case "enableOrDisableASubCommand" -> {
+                            helpMessage = Component.text()
+                                    .append(Component.text("\n[CustomWhitelistV2] Enable or disable a subcommand\n", NamedTextColor.AQUA))
+                                    .append(Component.text("Usage: /customWhitelistV2 enableOrDisableASubCommand <subcommand> <enable/disable>\n", NamedTextColor.GREEN))
+                                    .append(Component.text("This command allows you to enable or disable a specific subcommand.", NamedTextColor.YELLOW));
+                        }
+                        case "listAllActivatedSubCommands" -> {
+                            helpMessage = Component.text()
+                                    .append(Component.text("\n[CustomWhitelistV2] List all activated subcommands\n", NamedTextColor.AQUA))
+                                    .append(Component.text("Usage: /customWhitelistV2 listAllActivatedSubCommands\n", NamedTextColor.GREEN))
+                                    .append(Component.text("This command lists all the currently active subcommands.", NamedTextColor.YELLOW));
+                        }
+                        case "addPlayer" -> {
+                            helpMessage = Component.text()
+                                    .append(Component.text("\n[CustomWhitelistV2] Add a player to the custom whitelist\n", NamedTextColor.AQUA))
+                                    .append(Component.text("Usage: /customWhitelistV2 addPlayer <playerName>\n", NamedTextColor.GREEN))
+                                    .append(Component.text("This command adds a specified player to the custom whitelist.", NamedTextColor.YELLOW));
+                        }
+                        case "removePlayer" -> {
+                            helpMessage = Component.text()
+                                    .append(Component.text("\n[CustomWhitelistV2] Remove a player from the custom whitelist\n", NamedTextColor.AQUA))
+                                    .append(Component.text("Usage: /customWhitelistV2 removePlayer <playerName>\n", NamedTextColor.GREEN))
+                                    .append(Component.text("This command removes a specified player from the custom whitelist.", NamedTextColor.YELLOW));
+                        }
+                        case "listPlayers" -> {
+                            helpMessage = Component.text()
+                                    .append(Component.text("\n[CustomWhitelistV2] List all players in the custom whitelist\n", NamedTextColor.AQUA))
+                                    .append(Component.text("Usage: /customWhitelistV2 listPlayers\n", NamedTextColor.GREEN))
+                                    .append(Component.text("This command lists all the players in the custom whitelist.", NamedTextColor.YELLOW));
+                        }
+                        case "statusOfPlayer" -> {
+                            helpMessage = Component.text()
+                                    .append(Component.text("\n[CustomWhitelistV2] Get the status of a player\n", NamedTextColor.AQUA))
+                                    .append(Component.text("Usage: /customWhitelistV2 statusOfPlayer <playerName>\n", NamedTextColor.GREEN))
+                                    .append(Component.text("This command retrieves the status of a specified player.", NamedTextColor.YELLOW));
+                        }
+                        case "updatePlayerStatus" -> {
+                            helpMessage = Component.text()
+                                    .append(Component.text("\n[CustomWhitelistV2] Update the status of a player\n", NamedTextColor.AQUA))
+                                    .append(Component.text("Usage: /customWhitelistV2 updatePlayerStatus <playerName> <status>\n", NamedTextColor.GREEN))
+                                    .append(Component.text("This command updates the status of a specified player.", NamedTextColor.YELLOW));
+                        }
+                        case "updatePassword" -> {
+                            helpMessage = Component.text()
+                                    .append(Component.text("\n[CustomWhitelistV2] Update the password\n", NamedTextColor.AQUA))
+                                    .append(Component.text("Usage: /customWhitelistV2 updatePassword <newPassword>\n", NamedTextColor.GREEN))
+                                    .append(Component.text("This command updates the password.", NamedTextColor.YELLOW));
+                        }
+                        case "checkPassword" -> {
+                            helpMessage = Component.text()
+                                    .append(Component.text("\n[CustomWhitelistV2] Check if a password is correct\n", NamedTextColor.AQUA))
+                                    .append(Component.text("Usage: /customWhitelistV2 checkPassword <password>\n", NamedTextColor.GREEN))
+                                    .append(Component.text("This command checks if the provided password is correct.", NamedTextColor.YELLOW));
+                        }
+                        case "help" -> {
+                            helpMessage = Component.text()
+                                    .append(Component.text("\n[CustomWhitelistV2] Get help with the plugin\n", NamedTextColor.AQUA))
+                                    .append(Component.text("Usage: /customWhitelistV2 help <subcommand>\n", NamedTextColor.GREEN))
+                                    .append(Component.text("This command provides help for a specific subcommand.", NamedTextColor.YELLOW));
+                        }
+                    }
+                }
+                
+                if (helpMessage == null) {
+                    commandSender.sendMessage(Component.text()
+                            .append(Component.text("\n[CustomWhitelistV2] Unknown subcommand ", NamedTextColor.RED))
+                            .append(Component.text(subCommand, NamedTextColor.YELLOW)));
+                    return true;
+                }
+                
+                commandSender.sendMessage(helpMessage);
+                break;
                 
                 
             default:

@@ -21,6 +21,15 @@ public class CustomWhitelistV2TabCompleter implements TabCompleter {
                     .filter(subCommand -> subCommand.toLowerCase().startsWith(input))
                     .collect(Collectors.toList());
         }
+        
+        if ((command.getName().equalsIgnoreCase("customWhitelistV2") || command.getName().equalsIgnoreCase("cwv2")) && args.length == 2 && args[0].equalsIgnoreCase("help")) {
+            String input = args[1].toLowerCase();
+            List<String> allSubCommands = Arrays.asList("enableOrDisableASubCommand", "listAllActivatedSubCommands", "addPlayer", "removePlayer", "listPlayers", "statusOfPlayer", "updatePlayerStatus", "updatePassword", "checkPassword", "help");
+            allSubCommands.sort(String::compareToIgnoreCase);
+            return allSubCommands.stream()
+                    .filter(subCommand -> subCommand.toLowerCase().startsWith(input))
+                    .collect(Collectors.toList());
+        }
 
         // If the player chooses the sub command "updatePlayerStatus", we want to provide the player with the following options:
         //        WHITELISTED
