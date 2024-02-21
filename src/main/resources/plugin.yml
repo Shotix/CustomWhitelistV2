@@ -22,8 +22,8 @@ commands:
     usage: "/msgModerator <message>"
     aliases: [ mm ]
 
-  customWhitelistV2Debugging:
+  customWhitelistV2Admin:
     description: "Manage the debug mode of the CustomWhitelistV2 plugin"
-    usage: "/customWhitelistV2Debugging <enableOrDisable>"
+    usage: "/customWhitelistV2Admin <debug|addModerator|removeModerator|listAllModerators>"
     permission: "customwhitelistv2.administrator"
-    aliases: [ cwv2d ]
+    aliases: [ cwv2a ]

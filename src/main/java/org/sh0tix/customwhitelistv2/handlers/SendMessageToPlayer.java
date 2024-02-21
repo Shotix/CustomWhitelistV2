@@ -8,8 +8,10 @@ import java.util.List;
 
 import net.kyori.adventure.text.Component;
 
+@Deprecated
 public class SendMessageToPlayer {
     
+    @Deprecated
     private static class MessagePart {
         String messagePart;
         String pluginName = "CustomWhitelistV2";

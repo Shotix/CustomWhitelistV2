@@ -2,19 +2,12 @@ package org.sh0tix.customwhitelistv2.handlers;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.sh0tix.customwhitelistv2.whitelist.CWV2Player;
 import org.sh0tix.customwhitelistv2.whitelist.Password;
 
 import java.io.*;
-import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
