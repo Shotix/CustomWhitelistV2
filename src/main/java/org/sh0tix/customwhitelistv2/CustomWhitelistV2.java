@@ -10,7 +10,7 @@ import net.luckperms.api.node.types.PermissionNode;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.sh0tix.customwhitelistv2.commands.CustomWhitelistV2Commands;
-import org.sh0tix.customwhitelistv2.commands.DebugCommand;
+import org.sh0tix.customwhitelistv2.commands.AdminCommand;
 import org.sh0tix.customwhitelistv2.commands.LoginCommand;
 import org.sh0tix.customwhitelistv2.commands.MsgModeratorCommand;
 import org.sh0tix.customwhitelistv2.listener.ChatListener;
@@ -58,8 +58,8 @@ public final class CustomWhitelistV2 extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ChatListener(), this);
         
         // Register the commands
-        Objects.requireNonNull(getCommand("customWhitelistV2Debugging")).setExecutor(new DebugCommand());
-        Objects.requireNonNull(getCommand("customWhitelistV2Debugging")).setTabCompleter(new CustomWhitelistV2DebuggingTabCompleter());
+        Objects.requireNonNull(getCommand("customWhitelistV2Admin")).setExecutor(new AdminCommand());
+        Objects.requireNonNull(getCommand("customWhitelistV2Admin")).setTabCompleter(new CustomWhitelistV2AdminTabCompleter());
         Objects.requireNonNull(getCommand("msgModerator")).setExecutor(new MsgModeratorCommand());
         Objects.requireNonNull(getCommand("login")).setExecutor(new LoginCommand());
         Objects.requireNonNull(getCommand("customWhitelistV2")).setTabCompleter(new CustomWhitelistV2TabCompleter());
@@ -89,11 +89,36 @@ public final class CustomWhitelistV2 extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
             return true;
         }
-
+        
         // Create the permissions
         PermissionNode.builder("customwhitelistv2.manage").build();
         PermissionNode.builder("customwhitelistv2.administrator").build();
         PermissionNode.builder("customwhitelistv2.login").build();
+
+        // Create the manage group and add permissions
+        Group manageGroup = api.getGroupManager().getGroup("customwhitelistv2.manage");
+        if (manageGroup == null) {
+            manageGroup = api.getGroupManager().createAndLoadGroup("customwhitelistv2.manage").join();
+            manageGroup.data().add(PermissionNode.builder("customwhitelistv2.manage").build());
+            api.getGroupManager().saveGroup(manageGroup);
+        }
+
+        // Create the administrator group and add permissions
+        Group administratorGroup = api.getGroupManager().getGroup("customwhitelistv2.administrator");
+        if (administratorGroup == null) {
+            administratorGroup = api.getGroupManager().createAndLoadGroup("customwhitelistv2.administrator").join();
+            administratorGroup.data().add(PermissionNode.builder("customwhitelistv2.administrator").build());
+            api.getGroupManager().saveGroup(administratorGroup);
+        }
+
+        // Create the login group and add permissions
+        Group loginGroup = api.getGroupManager().getGroup("customwhitelistv2.login");
+        if (loginGroup == null) {
+            loginGroup = api.getGroupManager().createAndLoadGroup("customwhitelistv2.login").join();
+            loginGroup.data().add(PermissionNode.builder("customwhitelistv2.login").build());
+            api.getGroupManager().saveGroup(loginGroup);
+        }
+        
         return false;
     }
     

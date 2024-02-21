@@ -6,7 +6,7 @@
 
   <groupId>org.sh0tix</groupId>
   <artifactId>CustomWhitelistV2</artifactId>
-  <version>0.2.1</version>
+  <version>0.2.1.2</version>
   <packaging>jar</packaging>
 
   <name>CustomWhitelistV2</name>
@@ -72,11 +72,6 @@
           <artifactId>api</artifactId>
           <version>5.3</version>
           <scope>provided</scope>
-      </dependency>
-      <dependency>
-          <groupId>org.json</groupId>
-          <artifactId>org.json</artifactId>
-          <version>chargebee-1.0</version>
       </dependency>
   </dependencies>
 </project>
