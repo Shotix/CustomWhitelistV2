@@ -205,8 +205,25 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                     Gson gson = new Gson();
                     CWV2Player playerToAdd = gson.fromJson(response.toString(), CWV2Player.class);
                     
+                    // Get the inputted status of the new player from the args
+                    String status = args[2];
+                    CWV2Player.Status newPlayerStatus;
+                    
+                    // Check if the status is valid
+                    try {
+                        newPlayerStatus = CWV2Player.Status.valueOf(status);
+                    } catch (IllegalArgumentException e) {
+                        newPlayerStatus = CWV2Player.Status.NOT_WHITELISTED;
+                        commandSender.sendMessage(Component.text()
+                                .append(Component.text("[CustomWhitelistV2] The status ", NamedTextColor.YELLOW))
+                                .append(Component.text(status, NamedTextColor.WHITE))
+                                .append(Component.text(" is not valid", NamedTextColor.YELLOW))
+                                .append(Component.text("\nThe player status has been initialized to ", NamedTextColor.YELLOW))
+                                .append(Component.text(CWV2Player.Status.NOT_WHITELISTED.toString(), NamedTextColor.WHITE)));
+                    }
+                    
                     // Set the rest of the playerToAdd object
-                    playerToAdd.setStatus(CWV2Player.Status.WHITELISTED);
+                    playerToAdd.setStatus(newPlayerStatus);
                     playerToAdd.setLastUpdated(CWV2Player.getUpdatedTime());
                     playerToAdd.setNumberOfTimesJoined(0);
                     playerToAdd.setNumberOfWrongPasswordsEntered(0);
