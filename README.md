@@ -22,13 +22,14 @@ CustomWhitelistV2 is a Minecraft plugin developed in Java using the Bukkit API. 
 - `/customWhitelistV2 <enableOrDisableASubCommand|listAllActivatedSubCommands|addPlayer|removePlayer|listPlayers|statusOfPlayer|updatePlayerStatus|updatePassword|checkPassword|help>`
 - `/login <password>`
 - `/msgModerator <message>`
-- `/customWhitelistV2Debugging <enableOrDisable>`
+- `/customWhitelistV2Admin <enableOrDisable>`
 
 ## Installation
 
 1. Download the latest release from the GitHub repository.
 2. Place the .jar file in your server's plugins folder.
 3. Restart your server.
+4. Give yourself the Luck Perms role "customwhitelistv2.administrator" with the command `/lp user <user> permissions set customwhitelistv2.administrator`
 
 ## Contributing
 
