@@ -31,6 +31,10 @@ public class CustomWhitelistV2TabCompleter implements TabCompleter {
                     .collect(Collectors.toList());
         }
 
+        if ((command.getName().equalsIgnoreCase("customWhitelistV2") || command.getName().equalsIgnoreCase("cwv2")) && args.length == 3 && args[0].equalsIgnoreCase("addPlayer")) {
+            return getStatusStrings(args);
+        }
+
         // If the player chooses the sub command "updatePlayerStatus", we want to provide the player with the following options:
         //        WHITELISTED
         //        NOT_WHITELISTED,
@@ -41,12 +45,7 @@ public class CustomWhitelistV2TabCompleter implements TabCompleter {
         //        REMOVED,
         //        UNKNOWN
         if ((command.getName().equalsIgnoreCase("customWhitelistV2") || command.getName().equalsIgnoreCase("cwv2")) && args.length == 3 && args[0].equalsIgnoreCase("updatePlayerStatus")) {
-            String input = args[2].toLowerCase();
-            List<String> allStatuses = Arrays.asList("WHITELISTED", "NOT_WHITELISTED", "BANNED", "KICKED", "TEMP_BANNED", "TEMP_KICKED", "REMOVED", "UNKNOWN");
-            allStatuses.sort(String::compareToIgnoreCase);
-            return allStatuses.stream()
-                    .filter(status -> status.toLowerCase().startsWith(input))
-                    .collect(Collectors.toList());
+            return getStatusStrings(args);
         }
 
         // If the player chooses the sub command "TEMP_BANNED" or "TEMP_KICKED", the player should now input a time period for the ban or kick.
@@ -88,5 +87,15 @@ public class CustomWhitelistV2TabCompleter implements TabCompleter {
                     .collect(Collectors.toList());
         }
         return null;
+    }
+
+    @NotNull
+    private List<String> getStatusStrings(@NotNull String[] args) {
+        String input = args[2].toLowerCase();
+        List<String> allStatuses = Arrays.asList("WHITELISTED", "NOT_WHITELISTED", "BANNED", "KICKED", "TEMP_BANNED", "TEMP_KICKED", "REMOVED", "UNKNOWN");
+        allStatuses.sort(String::compareToIgnoreCase);
+        return allStatuses.stream()
+                .filter(status -> status.toLowerCase().startsWith(input))
+                .collect(Collectors.toList());
     }
 }
