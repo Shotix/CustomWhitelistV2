@@ -15,6 +15,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.sh0tix.customwhitelistv2.handlers.PasswordHandler;
 import org.sh0tix.customwhitelistv2.handlers.PlayerStatusHandler;
 import org.sh0tix.customwhitelistv2.handlers.SendMessageToPlayer;
 import org.sh0tix.customwhitelistv2.handlers.WhitelistHandler;
@@ -45,6 +46,19 @@ public class EventListener implements Listener {
     public void event(PlayerJoinEvent playerJoinEvent) {
         // Suppress the join message
         playerJoinEvent.joinMessage(null);
+        
+        // Check if the password is still the default password "password"
+        if (PasswordHandler.checkPassword("password")) {
+            // If the user is OP and the password is still the default password, tell the user to change the password
+            if (playerJoinEvent.getPlayer().isOp()) {
+                playerJoinEvent.getPlayer().sendMessage(Component.text()
+                        .append(Component.text("[CustomWhitelistV2] The default password is still active. ", NamedTextColor.RED, TextDecoration.BOLD))
+                        .append(Component.text("Please change the password by typing ", NamedTextColor.RED, TextDecoration.BOLD))
+                        .append(Component.text("/customwhitelistv2 updatePassword <new password>", NamedTextColor.BLUE, TextDecoration.UNDERLINED))
+                        .append(Component.text(" in the chat", NamedTextColor.RED, TextDecoration.BOLD))
+                        .build());
+            }
+        }
         
         // When a player joins the server, check if they exist in the JSON file
         // If they do, check their status and act accordingly
