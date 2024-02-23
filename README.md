@@ -19,7 +19,7 @@ CustomWhitelistV2 is a Minecraft plugin developed in Java using the Bukkit API. 
 
 ## Commands
 
-- `/customWhitelistV2 <enableOrDisableASubCommand|listAllActivatedSubCommands|addPlayer|removePlayer|listPlayers|statusOfPlayer|updatePlayerStatus|updatePassword|checkPassword|help>`
+- `/customWhitelistV2 /customWhitelistV2 <enableOrDisableASubCommand|listAllActivatedSubCommands|addPlayer|removePlayer|listPlayers|statusOfPlayer|updatePlayerStatus|updatePassword|checkPassword|help>`
 - `/login <password>`
 - `/msgModerator <message>`
 - `/customWhitelistV2Admin <enableOrDisable>`
