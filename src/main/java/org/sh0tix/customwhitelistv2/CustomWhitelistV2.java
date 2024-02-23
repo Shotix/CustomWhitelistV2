@@ -3,20 +3,19 @@ package org.sh0tix.customwhitelistv2;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.luckperms.api.LuckPerms;
-import net.luckperms.api.LuckPermsProvider;
-import net.luckperms.api.model.group.Group;
-import net.luckperms.api.node.types.PermissionNode;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.sh0tix.customwhitelistv2.commands.CustomWhitelistV2Commands;
 import org.sh0tix.customwhitelistv2.commands.AdminCommand;
 import org.sh0tix.customwhitelistv2.commands.LoginCommand;
 import org.sh0tix.customwhitelistv2.commands.MsgModeratorCommand;
+import org.sh0tix.customwhitelistv2.handlers.LuckPermsHandler;
 import org.sh0tix.customwhitelistv2.listener.ChatListener;
 import org.sh0tix.customwhitelistv2.listener.EventListener;
 
 import java.util.Objects;
+
+import static org.bukkit.Bukkit.getServer;
 
 public final class CustomWhitelistV2 extends JavaPlugin {
     
@@ -33,12 +32,24 @@ public final class CustomWhitelistV2 extends JavaPlugin {
         // Check if PaperMC is used 
         if (!getServer().getVersion().contains("Paper")) {
             getLogger().severe("[CustomWhitelistV2] This plugin is designed to work with PaperMC only! Disabling CustomWhitelistV2...");
+            return;
+        }
+
+        // Check if the LuckPerms plugin is installed
+        if (getServer().getPluginManager().getPlugin("LuckPerms") == null) {
+            getLogger().severe("LuckPerms plugin not found! Disabling CustomWhitelistV2...");
+            getLogger().severe("Please install LuckPerms and restart the server!");
+            getLogger().severe("You can download LuckPerms from https://luckperms.net/download!");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
         
         // Check if the LuckPerms plugin is installed and enabled
-        if (checkForLuckPermsSetup()) return;
+        if (!LuckPermsHandler.setupLuckPerms()) {
+            getLogger().severe("[CustomWhitelistV2] There was an issue with LuckPerms! Disabling CustomWhitelistV2...");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
         
         // Send a message to the console
         getServer().getConsoleSender().sendMessage("[CustomWhitelistV2] CustomWhitelistV2 plugin has been enabled!");
@@ -64,62 +75,6 @@ public final class CustomWhitelistV2 extends JavaPlugin {
         Objects.requireNonNull(getCommand("login")).setExecutor(new LoginCommand());
         Objects.requireNonNull(getCommand("customWhitelistV2")).setTabCompleter(new CustomWhitelistV2TabCompleter());
         Objects.requireNonNull(getCommand("customWhitelistV2")).setExecutor(new CustomWhitelistV2Commands());
-    }
-
-    private boolean checkForLuckPermsSetup() {
-        // Check if the LuckPerms plugin is installed
-        if (getServer().getPluginManager().getPlugin("LuckPerms") == null) {
-            getLogger().severe("[CustomWhitelistV2] LuckPerms plugin not found! Disabling CustomWhitelistV2...");
-            getServer().getPluginManager().disablePlugin(this);
-            return true;
-        }
-
-        // Check if the LuckPerms plugin is enabled
-        if (!Objects.requireNonNull(getServer().getPluginManager().getPlugin("LuckPerms")).isEnabled()) {
-            getLogger().severe("[CustomWhitelistV2] LuckPerms plugin is not enabled! Disabling CustomWhitelistV2...");
-            getServer().getPluginManager().disablePlugin(this);
-            return true;
-        }
-
-        // Check if the necessary permissions are existing and add them if not
-        LuckPerms api = LuckPermsProvider.get();
-        Group group = api.getGroupManager().getGroup("default");
-        if (group == null) {
-            getLogger().severe("[CustomWhitelistV2] The group 'default' does not exist! Disabling CustomWhitelistV2...");
-            getServer().getPluginManager().disablePlugin(this);
-            return true;
-        }
-        
-        // Create the permissions
-        PermissionNode.builder("customwhitelistv2.manage").build();
-        PermissionNode.builder("customwhitelistv2.administrator").build();
-        PermissionNode.builder("customwhitelistv2.login").build();
-
-        // Create the manage group and add permissions
-        Group manageGroup = api.getGroupManager().getGroup("customwhitelistv2.manage");
-        if (manageGroup == null) {
-            manageGroup = api.getGroupManager().createAndLoadGroup("customwhitelistv2.manage").join();
-            manageGroup.data().add(PermissionNode.builder("customwhitelistv2.manage").build());
-            api.getGroupManager().saveGroup(manageGroup);
-        }
-
-        // Create the administrator group and add permissions
-        Group administratorGroup = api.getGroupManager().getGroup("customwhitelistv2.administrator");
-        if (administratorGroup == null) {
-            administratorGroup = api.getGroupManager().createAndLoadGroup("customwhitelistv2.administrator").join();
-            administratorGroup.data().add(PermissionNode.builder("customwhitelistv2.administrator").build());
-            api.getGroupManager().saveGroup(administratorGroup);
-        }
-
-        // Create the login group and add permissions
-        Group loginGroup = api.getGroupManager().getGroup("customwhitelistv2.login");
-        if (loginGroup == null) {
-            loginGroup = api.getGroupManager().createAndLoadGroup("customwhitelistv2.login").join();
-            loginGroup.data().add(PermissionNode.builder("customwhitelistv2.login").build());
-            api.getGroupManager().saveGroup(loginGroup);
-        }
-        
-        return false;
     }
     
 
