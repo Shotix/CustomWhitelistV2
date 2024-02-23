@@ -19,7 +19,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.sh0tix.customwhitelistv2.handlers.PasswordHandler;
 import org.sh0tix.customwhitelistv2.handlers.PlayerStatusHandler;
-import org.sh0tix.customwhitelistv2.handlers.SendMessageToPlayer;
 import org.sh0tix.customwhitelistv2.handlers.WhitelistHandler;
 import org.sh0tix.customwhitelistv2.whitelist.CWV2Player;
 
@@ -153,21 +152,22 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 
             case "listAllActivatedSubCommands":
                 // List logic here
-                SendMessageToPlayer message = new SendMessageToPlayer();
-                message.addPartToMessage("[CustomWhitelistV2] The following subcommands are active:\n", Color.YELLOW);
+                ComponentBuilder<TextComponent, TextComponent.Builder> messageToPlayerSubcommand = Component.text()
+                        .append(Component.text("\n[CustomWhitelistV2] The following subcommands are active:\n\n", NamedTextColor.YELLOW));
                 for (AllCommands commandEnum : AllCommands.values()) {
                     if (commandStatusHashMap.get(commandEnum) == CommandStatus.ACTIVE) {
-                        message.addPartToMessage(commandEnum.toString() + "\n", Color.GREEN);
+                        messageToPlayerSubcommand.append(Component.text(commandEnum.toString() + "\n", NamedTextColor.GREEN));
                     }
                 }
-                message.addPartToMessage("[CustomWhitelistV2] The following subcommands are inactive: ", Color.YELLOW);
+                messageToPlayerSubcommand.append(Component.text("\n[CustomWhitelistV2] The following subcommands are inactive: ", NamedTextColor.YELLOW));
                 for (AllCommands commandEnum : AllCommands.values()) {
                     if (commandStatusHashMap.get(commandEnum) == CommandStatus.INACTIVE) {
-                        message.addPartToMessage(commandEnum.toString() + "\n", Color.RED);
+                        messageToPlayerSubcommand.append(Component.text(commandEnum.toString() + "\n\n", NamedTextColor.RED));
                     }
                 }
-                message.addPartToMessage("If you want to enable or disable a subcommand, use the command /customWhitelistV2 enableOrDisableASubCommand <subcommand> <enable/disable>", Color.YELLOW);
-                commandSender.sendMessage(message.getMessage());
+                messageToPlayerSubcommand.append(Component.text("If you want to enable or disable a subcommand, use the command /customWhitelistV2 enableOrDisableASubCommand <subcommand> <enable/disable>", NamedTextColor.YELLOW));
+                
+                commandSender.sendMessage(messageToPlayerSubcommand.build());
                 
                 break;
                
@@ -208,11 +208,15 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                     // Get the inputted status of the new player from the args
                     String status = args[2];
                     CWV2Player.Status newPlayerStatus;
+                     
+                    if (status == null) {
+                        status = "THIS STATUS IS INVALID";
+                    }
                     
                     // Check if the status is valid
                     try {
                         newPlayerStatus = CWV2Player.Status.valueOf(status);
-                    } catch (IllegalArgumentException e) {
+                    } catch (Exception e) {
                         newPlayerStatus = CWV2Player.Status.NOT_WHITELISTED;
                         commandSender.sendMessage(Component.text()
                                 .append(Component.text("[CustomWhitelistV2] The status ", NamedTextColor.YELLOW))
@@ -231,7 +235,11 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                     // Add the player to the custom whitelist
                     PlayerStatusHandler.insertNewPlayer(playerToAdd);
                     
-                    commandSender.sendMessage(Component.text("[CustomWhitelistV2] Added the player " + playerName + " to the custom whitelist", NamedTextColor.GREEN));
+                    commandSender.sendMessage(Component.text()
+                            .append(Component.text("[CustomWhitelistV2] Added the player ", NamedTextColor.GREEN))
+                            .append(Component.text(playerName, NamedTextColor.WHITE))
+                            .append(Component.text(" to the custom whitelist with the status ", NamedTextColor.GREEN))
+                            .append(Component.text(newPlayerStatus.toString(), NamedTextColor.WHITE)));
                     
                 } catch (Exception e) {
                     commandSender.sendMessage("[CustomWhitelistV2] Error connecting to the Mojang API");
@@ -301,31 +309,33 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 List<CWV2Player> players = PlayerStatusHandler.getAllPlayers();
 
                 // Create a new message
-                SendMessageToPlayer messageToPlayer = new SendMessageToPlayer();
-                messageToPlayer.addPartToMessage("[CustomWhitelistV2] The following players are in the custom whitelist:\n", Color.YELLOW);
-                messageToPlayer.addPartToMessage("Whitelisted players:\n", Color.GREEN);
+                
+                ComponentBuilder<TextComponent, TextComponent.Builder> messageToPlayer = Component.text()
+                        .append(Component.text("\n[CustomWhitelistV2] The following players are in the custom whitelist:\n", NamedTextColor.YELLOW))
+                        .append(Component.text("Whitelisted players:\n", NamedTextColor.GREEN));
+                
                 for (CWV2Player whitelistedPlayer : players) {
                     if (whitelistedPlayer.getStatus() == CWV2Player.Status.WHITELISTED) {
-                        messageToPlayer.addPartToMessage(whitelistedPlayer.getUsername() + "\n", Color.WHITE);
+                        messageToPlayer.append(Component.text(whitelistedPlayer.getUsername() + "\n", NamedTextColor.WHITE));
                     }
                 }
-                messageToPlayer.addPartToMessage("\nNon-whitelisted players:\n", Color.YELLOW);
+                messageToPlayer.append(Component.text("\n\nNon-whitelisted players:\n", NamedTextColor.YELLOW));
                 for (CWV2Player nonWhitelistedPlayer : players) {
                     if (nonWhitelistedPlayer.getStatus() == CWV2Player.Status.NOT_WHITELISTED) {
-                        messageToPlayer.addPartToMessage(nonWhitelistedPlayer.getUsername() + "\n", Color.WHITE);
+                        messageToPlayer.append(Component.text(nonWhitelistedPlayer.getUsername() + "\n", NamedTextColor.WHITE));
                     }
                 }
-                messageToPlayer.addPartToMessage("\nOther players:", Color.RED);
+                messageToPlayer.append(Component.text("\n\nOther players:", NamedTextColor.RED));
                 for (CWV2Player otherPlayer : players) {
                     if (otherPlayer.getStatus() != CWV2Player.Status.WHITELISTED && otherPlayer.getStatus() != CWV2Player.Status.NOT_WHITELISTED) {
-                        messageToPlayer.addPartToMessage("\n" + otherPlayer.getUsername(), Color.WHITE);
-                        messageToPlayer.addPartToMessage(" - ", Color.WHITE);
-                        messageToPlayer.addPartToMessage(otherPlayer.getStatus().toString(), Color.RED);
+                        messageToPlayer.append(Component.text("\n" + otherPlayer.getUsername(), NamedTextColor.WHITE));
+                        messageToPlayer.append(Component.text(" - ", NamedTextColor.WHITE));
+                        messageToPlayer.append(Component.text(otherPlayer.getStatus().toString(), NamedTextColor.RED));
                     }
                 }
                 
                 // Send the message to the command sender
-                commandSender.sendMessage(messageToPlayer.getMessage());
+                commandSender.sendMessage(messageToPlayer.build());
                 
                 break;
 
