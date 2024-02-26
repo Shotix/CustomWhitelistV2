@@ -21,3 +21,36 @@ CustomWhitelistV2:
     plugin_disabled_successfully:
       console_message: "CustomWhitelistV2 plugin has been disabled!"
       administrator_message: "[CustomWhitelistV2] CustomWhitelistV2 plugin has been disabled!"
+      
+
+# TODO: AdminCommand
+
+# TODO: CustomWhitelistV2Commands
+  
+# TODO: LoginCommand
+
+# TODO: MsgModeratorCommand
+
+# TODO: LocalizationHandler
+
+# TODO: LuckPermsHandler
+
+# TODO: PasswordHandler
+
+# TODO: PlayerStatusHandler
+
+# TODO: WhitelistHandler
+
+# TODO: ChatListener
+
+# TODO: EventListener
+
+# TODO: CWV2Player
+
+# TODO: Password
+
+# TODO: ComponentTypeAdapter
+
+# TODO: CustomWhitelistV2AdminTabCompleter
+
+# TODO: CustomWhitelistV2TabCompleter
