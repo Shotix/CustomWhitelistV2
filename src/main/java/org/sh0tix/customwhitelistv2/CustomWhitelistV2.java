@@ -1,14 +1,9 @@
 package org.sh0tix.customwhitelistv2;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.sh0tix.customwhitelistv2.commands.CustomWhitelistV2Commands;
@@ -20,14 +15,9 @@ import org.sh0tix.customwhitelistv2.handlers.LuckPermsHandler;
 import org.sh0tix.customwhitelistv2.listener.ChatListener;
 import org.sh0tix.customwhitelistv2.listener.EventListener;
 
-import java.io.*;
 import java.util.Objects;
 
-import static org.bukkit.Bukkit.getServer;
-
 public final class CustomWhitelistV2 extends JavaPlugin {
-    
-    private FileConfiguration localization;
 
     private static CustomWhitelistV2 instance;
 
