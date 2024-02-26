@@ -15,8 +15,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.sh0tix.customwhitelistv2.handlers.PasswordHandler;
 import org.sh0tix.customwhitelistv2.handlers.PlayerStatusHandler;
-import org.sh0tix.customwhitelistv2.handlers.SendMessageToPlayer;
 import org.sh0tix.customwhitelistv2.handlers.WhitelistHandler;
 import org.sh0tix.customwhitelistv2.whitelist.CWV2Player;
 
@@ -45,6 +45,19 @@ public class EventListener implements Listener {
     public void event(PlayerJoinEvent playerJoinEvent) {
         // Suppress the join message
         playerJoinEvent.joinMessage(null);
+        
+        // Check if the password is still the default password "password"
+        if (PasswordHandler.checkPassword("password")) {
+            // If the user is OP and the password is still the default password, tell the user to change the password
+            if (playerJoinEvent.getPlayer().isOp()) {
+                playerJoinEvent.getPlayer().sendMessage(Component.text()
+                        .append(Component.text("[CustomWhitelistV2] The default password is still active. ", NamedTextColor.RED, TextDecoration.BOLD))
+                        .append(Component.text("Please change the password by typing ", NamedTextColor.RED, TextDecoration.BOLD))
+                        .append(Component.text("/customwhitelistv2 updatePassword <new password>", NamedTextColor.BLUE, TextDecoration.UNDERLINED))
+                        .append(Component.text(" in the chat", NamedTextColor.RED, TextDecoration.BOLD))
+                        .build());
+            }
+        }
         
         // When a player joins the server, check if they exist in the JSON file
         // If they do, check their status and act accordingly
@@ -96,11 +109,11 @@ public class EventListener implements Listener {
                 *   "Welcome back to the server <player name>"
                 *   "You have joined the server <number of times joined> times"
                  */
-                SendMessageToPlayer message = new SendMessageToPlayer();
-                message.addPartToMessage("[CustomWhitelistV2] Welcome back to the server " + playerJoinEvent.getPlayer().getName(), Color.YELLOW);
                 
                 // Tell the user they are welcome back to the server
-                playerJoinEvent.getPlayer().sendMessage(message.getMessage());
+                playerJoinEvent.getPlayer().sendMessage(Component.text()
+                        .append(Component.text("Welcome back to the server ", NamedTextColor.GREEN))
+                        .append(Component.text(playerJoinEvent.getPlayer().getName(), NamedTextColor.GREEN, TextDecoration.BOLD)));
                 
                 // Make sure numberOfTimesJoined is not null, minimum value is 1
                 int numberOfTimesJoined = joinedPlayer.getNumberOfTimesJoined();
@@ -144,15 +157,17 @@ public class EventListener implements Listener {
                 *   "You can insert the password by typing /login <password>"
                 *   "If you don't have a password, please contact an admin"
                  */
-                SendMessageToPlayer message = new SendMessageToPlayer();
-                message.addPartToMessage("Welcome to the server " + playerJoinEvent.getPlayer().getName() + "\n", Color.YELLOW);
-                message.addPartToMessage("You are currently not whitelisted on the server. In order to join, please insert the correct password\n", Color.YELLOW);
-                message.addPartToMessage("You can insert the password by typing ", Color.YELLOW);
-                message.addPartToMessage("/login <password>\n", Color.GREEN);
-                message.addPartToMessage("If you don't have a password, please contact an admin", Color.YELLOW);
+                Component message = Component.text()
+                        .append(Component.text("Welcome to the server ", NamedTextColor.YELLOW))
+                        .append(Component.text(playerJoinEvent.getPlayer().getName(), NamedTextColor.GREEN, TextDecoration.BOLD))
+                        .append(Component.text("\nYou are currently not whitelisted on the server. In order to join, please insert the correct password\n", NamedTextColor.YELLOW))
+                        .append(Component.text("You can insert the password by typing ", NamedTextColor.YELLOW))
+                        .append(Component.text("/login <password>\n", NamedTextColor.GREEN))
+                        .append(Component.text("If you don't have a password, please contact an admin", NamedTextColor.YELLOW))
+                        .build();
                 
                 // Player is not whitelisted. Tell the user to insert the correct password.
-                playerJoinEvent.getPlayer().sendMessage(message.getMessage());
+                playerJoinEvent.getPlayer().sendMessage(message);
             }
             case BANNED -> {
                 // Player is banned. This should be handled by the server and the ban list.
