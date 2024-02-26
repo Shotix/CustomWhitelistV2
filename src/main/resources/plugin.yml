@@ -24,6 +24,6 @@ commands:
 
   customWhitelistV2Admin:
     description: "Manage the debug mode of the CustomWhitelistV2 plugin"
-    usage: "/customWhitelistV2Admin <debug|addModerator|removeModerator|listAllModerators>"
+    usage: "/customWhitelistV2Admin <debug|addModerator|removeModerator|listAllModerators|setPluginLanguage>"
     permission: "customwhitelistv2.administrator"
     aliases: [ cwv2a ]
