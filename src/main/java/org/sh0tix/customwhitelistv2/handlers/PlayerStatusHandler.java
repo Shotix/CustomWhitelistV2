@@ -371,7 +371,7 @@ public class PlayerStatusHandler {
             }
             
             // Debugging console message, if debug flag is set to true
-            if (CustomWhitelistV2.debugMode) {
+            if (CustomWhitelistV2.getDebugMode()) {
                 CustomWhitelistV2.getInstance().getLogger().info("Player " + player.getUsername() + " has been " + status + " until " + generateExpiryDateFromTimeString(timeString));
                 CustomWhitelistV2.getInstance().getLogger().info("Reason: " + generateReasonComponentFromString(status, reasonString, generateExpiryDateFromTimeString(timeString)));
             }
