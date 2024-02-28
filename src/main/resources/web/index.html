@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Homepage</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">CustomWhitelistV2</a>
+</nav>
+
+<!-- Page Content -->
+<div class="container">
+    <h1 class="mt-4 mb-4">Homepage</h1>
+
+    <!-- Player Table -->
+    <table class="table table-striped" id="playerTable">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Number of times joined</th>
+            <th>Last Updated</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Player data will be inserted here -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Include Bootstrap JS and jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- Fetch and display player data -->
+<script>
+    fetch('http://localhost:7777/api/players')
+        .then(response => response.json())
+        .then(players => {
+            console.log(players)
+            let table = document.getElementById('playerTable');
+            players.forEach(player => {
+                let row = table.insertRow();
+                row.insertCell().innerText = player.username;
+                row.insertCell().innerText = player.status;
+                row.insertCell().innerText = player.numberOfTimesJoined;
+                row.insertCell().innerText = player.lastUpdated;
+                // Add buttons here
+            });
+        });
+</script>
+</body>
+</html>
