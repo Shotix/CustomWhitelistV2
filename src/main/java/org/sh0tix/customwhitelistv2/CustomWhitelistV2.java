@@ -14,6 +14,7 @@ import org.sh0tix.customwhitelistv2.handlers.LocalizationHandler;
 import org.sh0tix.customwhitelistv2.handlers.LuckPermsHandler;
 import org.sh0tix.customwhitelistv2.listener.ChatListener;
 import org.sh0tix.customwhitelistv2.listener.EventListener;
+import org.sh0tix.customwhitelistv2.web.WebServer;
 
 import java.util.Objects;
 
@@ -24,6 +25,7 @@ public final class CustomWhitelistV2 extends JavaPlugin {
     private boolean debugMode = true;
     
     private LocalizationHandler localizationHandler;
+    private WebServer webServer;
     
     public static LocalizationHandler getLocalizationHandler() {
         return instance.localizationHandler;
@@ -52,6 +54,13 @@ public final class CustomWhitelistV2 extends JavaPlugin {
         localizationHandler.loadLocalization(localizationHandler.loadSelectedLanguage());
         getLogger().info(localizationHandler.getLocalisedString("CustomWhitelistV2.onEnable.localization_initialization"));
         
+        // Set up the web files
+        // FIXME: Change "replace" to false in production
+        saveResource("web/index.html", true);
+        
+        // Start the web server
+        webServer = new WebServer();
+        webServer.startServer();
         
         // Check if PaperMC is used 
         if (!getServer().getVersion().contains("Paper")) {
@@ -104,6 +113,9 @@ public final class CustomWhitelistV2 extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        // Stop the web server
+        webServer.stopServer();
+        
         // Cancel all tasks associated with this plugin
         getServer().getScheduler().cancelTasks(this);
 
