@@ -6,7 +6,7 @@
 
   <groupId>org.sh0tix</groupId>
   <artifactId>CustomWhitelistV2</artifactId>
-  <version>1.1.0</version>
+  <version>1.1.5-webserver-test</version>
   <packaging>jar</packaging>
 
   <name>CustomWhitelistV2</name>
