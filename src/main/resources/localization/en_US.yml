@@ -4,7 +4,8 @@
 # Class: CustomWhitelistV2
 CustomWhitelistV2:
   
-  onEnable: 
+  onEnable:
+    web_server_started: "Webserver has been started on localhost! Please open the following link in your browser: http://localhost:7777"
     papermc_not_used: "This plugin is designed to work with PaperMC only! Disabling CustomWhitelistV2..."
     luckperms_not_found: 
       message_not_found: "LuckPerms not found! Disabling CustomWhitelistV2..."
