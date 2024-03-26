@@ -3,7 +3,6 @@ package org.sh0tix.customwhitelistv2;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.sh0tix.customwhitelistv2.commands.CustomWhitelistV2Commands;
