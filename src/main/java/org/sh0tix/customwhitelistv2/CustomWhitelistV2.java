@@ -22,7 +22,7 @@ public final class CustomWhitelistV2 extends JavaPlugin {
 
     private static CustomWhitelistV2 instance;
 
-    private boolean debugMode = true;
+    private boolean debugMode = false;
     
     private LocalizationHandler localizationHandler;
     private WebServer webServer;
