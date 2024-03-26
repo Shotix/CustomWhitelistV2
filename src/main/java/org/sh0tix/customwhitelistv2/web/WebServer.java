@@ -215,7 +215,7 @@ public class WebServer {
     static class PlayerHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange t) throws IOException {
-            List<CWV2Player> players = PlayerStatusHandler.getAllPlayers(); // Replace with your method to get players
+            List<CWV2Player> players = PlayerStatusHandler.getAllPlayers();
             String response = new Gson().toJson(players);
             byte[] bytes = response.getBytes(StandardCharsets.UTF_8);
             t.sendResponseHeaders(200, bytes.length);
