@@ -448,20 +448,20 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                         }
                         break;
                     case TEMP_BANNED, TEMP_KICKED:
+                        // Get the duration of the ban from the args
+                        String duration = args[3];
+
+                        // Get the reason for the ban from the args. The reason is the rest of the args
+                        StringBuilder reason = new StringBuilder();
+                        for (int i = 4; i < args.length; i++) {
+                            reason.append(args[i]).append(" ");
+                        }
+
+                        PlayerStatusHandler.setPlayerIsTempBannedOrTempKicked(PlayerStatusHandler.FindPlayerByUUID(playerUuidToUpdate), CWV2Player.Status.valueOf(status), reason.toString(), duration);
+                        
                         // If the player is online, give the player all the effects a banned player would have
                         if (playerOnline != null) {
                             WhitelistHandler.disablePlayerMovementAndSight(playerOnline);
-                            
-                            // Get the duration of the ban from the args
-                            String duration = args[3];
-                            
-                            // Get the reason for the ban from the args. The reason is the rest of the args
-                            StringBuilder reason = new StringBuilder();
-                            for (int i = 4; i < args.length; i++) {
-                                reason.append(args[i]).append(" ");
-                            }
-
-                            PlayerStatusHandler.setPlayerIsTempBannedOrTempKicked(PlayerStatusHandler.FindPlayerByUUID(playerUuidToUpdate), CWV2Player.Status.valueOf(status), reason.toString(), duration);
                             
                             // Send the player a message that they have been banned or kicked and that they can no longer join the server
                             Component kickMessage = PlayerStatusHandler.getTempBanOrTempKickMessage(Objects.requireNonNull(PlayerStatusHandler.FindPlayerByUUID(playerUuidToUpdate)));
