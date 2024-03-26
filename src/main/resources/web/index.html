@@ -17,7 +17,7 @@
 
 <!-- Page Content -->
 <div class="container">
-    <h1 class="mt-4 mb-4">Homepage</h1>
+    <h1 class="mt-4 mb-4" id="page-title">Homepage</h1>
 
     <!-- Player Table -->
     <table class="table table-striped" id="playerTable">
@@ -25,16 +25,38 @@
         <tr>
             <th>Name</th>
             <th>Status</th>
-            <th>Number of times joined</th>
-            <th>Last Updated</th>
-            <th>Actions</th>
+            <th>Detailed Information</th>
         </tr>
         </thead>
         <tbody>
         <!-- Player data will be inserted here -->
         </tbody>
     </table>
+
+
+    <!-- Player Details Table -->
+    <table class="table table-striped" id="playerDetailsTable" style="display: none;">
+        <thead>
+        <!-- Table header will be inserted here -->
+        </thead>
+        <tbody>
+        <!-- Player details will be inserted here -->
+        </tbody>
+    </table>
+    
+    <!-- Buttons for the detailed table -->
+    <div class="mt-4" style="display: none" id="detailButtons">
+        <button class="btn btn-primary" onclick="submitDetailsForm()">Submit</button>
+        <button class="btn btn-secondary" onclick="showPlayerTable()">Cancel</button>
+    </div>
+    
 </div>
+
+<!-- Hidden text fields for the duration, reason and unit for a new temp ban / kick -->
+<input type="hidden" id="newStatus">
+<input type="hidden" id="duration">
+<input type="hidden" id="unit">
+<input type="hidden" id="reason">
 
 <!-- Include Bootstrap JS and jQuery -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -42,18 +64,153 @@
 
 <!-- Fetch and display player data -->
 <script>
+    function submitDetailsForm() {
+        fetch('http://localhost:7777/api/updatePlayerStatus', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'username=' + document.getElementById('playerDetailsTable').rows[0].cells[1].innerText + '&status=' + document.getElementById('newStatus').value + '&duration=' + document.getElementById('duration').value + '&unit=' + document.getElementById('unit').value + '&reason=' + document.getElementById('reason').value
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data) {
+                    alert('Status updated successfully');
+                } else {
+                    alert('An error occurred. Please try again.');
+                }
+            });
+        showPlayerTable();
+        location.reload();
+    }
+    
+    function showPlayerTable() {
+        document.getElementById('detailButtons').style.display = 'none';
+        document.getElementById('playerTable').style.display = 'table';
+        document.getElementById('playerDetailsTable').style.display = 'none';
+    }
+    
+    
     fetch('http://localhost:7777/api/players')
         .then(response => response.json())
         .then(players => {
-            console.log(players)
             let table = document.getElementById('playerTable');
             players.forEach(player => {
                 let row = table.insertRow();
                 row.insertCell().innerText = player.username;
                 row.insertCell().innerText = player.status;
-                row.insertCell().innerText = player.numberOfTimesJoined;
-                row.insertCell().innerText = player.lastUpdated;
-                // Add buttons here
+
+                // Create a new button
+                let detailsButton = document.createElement('button');
+                detailsButton.innerText = 'Details';
+                detailsButton.onclick = function() {
+                    fetch('http://localhost:7777/api/players/' + player.username)
+                        .then(response => response.json())
+                        .then(playerDetails => {
+                            // Hide the player table and show the player details table
+                            document.getElementById('playerTable').style.display = 'none';
+                            let detailsTable = document.getElementById('playerDetailsTable');
+                            detailsTable.style.display = 'table';
+                            
+                            // Show the detail buttons
+                            document.getElementById('detailButtons').style.display = 'block';
+
+                            // Clear the body of the details table and add the player details
+                            let detailsTbody = detailsTable.getElementsByTagName('tbody')[0];
+                            detailsTbody.innerHTML = '';
+
+                            // Add a new row for each detail
+                            let nameRow = detailsTbody.insertRow();
+                            nameRow.insertCell().innerText = 'Name:';
+                            nameRow.cells[0].style.fontWeight = 'bold';
+                            nameRow.insertCell().innerText = playerDetails.username;
+
+                            let statusRow = detailsTbody.insertRow();
+                            statusRow.insertCell().innerText = 'Status:';
+                            statusRow.cells[0].style.fontWeight = 'bold';
+                            
+                            // Create a select element for the status
+                            let select = document.createElement('select');
+                            
+                            // Add the options
+                            let statuses = ["WHITELISTED", "NOT_WHITELISTED", "BANNED", "KICKED", "TEMP_BANNED", "TEMP_KICKED", "REMOVED"]
+                            statuses.forEach(status => {
+                                let option = document.createElement('option');
+                                option.value = status;
+                                option.text = status;
+                                if (status === playerDetails.status) {
+                                    option.selected = true;
+                                }
+                                select.appendChild(option);
+                            });
+                            
+                            // Add an event listener to the select element
+                            select.addEventListener('change', (event) => {
+                                let newStatus = event.target.value;
+
+                                // If the new status in TEMP_BANNED or TEMP_KICKED, show a prompt to enter the duration
+                                if (newStatus === "TEMP_BANNED" || newStatus ==="TEMP_KICKED") {
+                                    // Let the user enter the duration in a prompt. The user should also be able to select the unit (seconds, minutes, hours, days)
+                                    let duration = prompt("Enter the duration with the wanted unit (seconds, minutes, hours, days):");
+                                    let reason = prompt("Enter the reason:")
+                                    
+                                    // Set a flag to true if the user entered a valid duration
+                                    let validDuration = false;
+                                    if (duration !== null && duration !== "" && reason !== null && reason !== "") {
+                                        let unit = duration.split(" ")[1];
+                                        duration = duration.split(" ")[0];
+                                        if (unit === "seconds" || unit === "minutes" || unit === "hours" || unit === "days") {
+                                            document.getElementById('unit').value = unit;
+                                            validDuration = true;
+                                        }
+                                    }
+                                    
+                                    // If the duration is not valid, show an alert and set the status back to the original value
+                                    if (!validDuration) {
+                                        alert("Invalid duration unit or reason. Please try again.");
+                                        select.value = playerDetails.status;
+                                    } else {
+                                        // Add the values to hidden text fields on the side of the table
+                                        document.getElementById('duration').value = duration;
+                                        document.getElementById('reason').value = reason;
+                                        
+                                        // Add the new rows for the duration and reason
+                                        let durationRow = detailsTbody.insertRow();
+                                        durationRow.insertCell().innerText = 'Duration:';
+                                        durationRow.cells[0].style.fontWeight = 'bold';
+                                        durationRow.insertCell().innerText = duration + " " + document.getElementById('unit').value;
+                                        
+                                        let reasonRow = detailsTbody.insertRow();
+                                        reasonRow.insertCell().innerText = 'Reason:';
+                                        reasonRow.cells[0].style.fontWeight = 'bold';
+                                        reasonRow.insertCell().innerText = reason;
+                                    }
+                                }
+                                document.getElementById('newStatus').value = newStatus;
+                            });
+                            
+                            statusRow.insertCell().appendChild(select);
+
+                            let timesJoinedRow = detailsTbody.insertRow();
+                            timesJoinedRow.insertCell().innerText = 'Number of Times Joined:';
+                            timesJoinedRow.cells[0].style.fontWeight = 'bold';
+                            timesJoinedRow.insertCell().innerText = playerDetails.numberOfTimesJoined;
+
+                            let wrongPasswordsRow = detailsTbody.insertRow();
+                            wrongPasswordsRow.insertCell().innerText = 'Number of Wrong Passwords Entered:';
+                            wrongPasswordsRow.cells[0].style.fontWeight = 'bold';
+                            wrongPasswordsRow.insertCell().innerText = playerDetails.numberOfWrongPasswordsEntered;
+
+                            let lastUpdatedRow = detailsTbody.insertRow();
+                            lastUpdatedRow.insertCell().innerText = 'Last Updated:';
+                            lastUpdatedRow.cells[0].style.fontWeight = 'bold';
+                            lastUpdatedRow.insertCell().innerText = playerDetails.lastUpdated;
+                        });
+                };
+
+                // Add the button to the last cell in the row
+                let buttonCell = row.insertCell();
+                buttonCell.appendChild(detailsButton);
             });
         });
 </script>
