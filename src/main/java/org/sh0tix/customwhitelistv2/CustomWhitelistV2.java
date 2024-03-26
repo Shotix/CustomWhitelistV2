@@ -57,6 +57,7 @@ public final class CustomWhitelistV2 extends JavaPlugin {
         // Set up the web files
         // FIXME: Change "replace" to false in production
         saveResource("web/index.html", true);
+        saveResource("web/changePassword.html", true);
         
         // Start the web server
         webServer = new WebServer();
