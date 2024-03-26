@@ -55,13 +55,13 @@ public final class CustomWhitelistV2 extends JavaPlugin {
         getLogger().info(localizationHandler.getLocalisedString("CustomWhitelistV2.onEnable.localization_initialization"));
         
         // Set up the web files
-        // FIXME: Change "replace" to false in production
         saveResource("web/index.html", true);
         saveResource("web/changePassword.html", true);
         
         // Start the web server
         webServer = new WebServer();
         webServer.startServer();
+        getLogger().info(localizationHandler.getLocalisedString("CustomWhitelistV2.onEnable.web_server_started"));
         
         // Check if PaperMC is used 
         if (!getServer().getVersion().contains("Paper")) {
