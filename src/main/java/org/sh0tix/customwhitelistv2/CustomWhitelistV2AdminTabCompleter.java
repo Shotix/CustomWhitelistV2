@@ -27,7 +27,7 @@ public class CustomWhitelistV2AdminTabCompleter implements TabCompleter {
 
         if ((command.getName().equalsIgnoreCase("customWhitelistV2Admin") || command.getName().equalsIgnoreCase("cwv2a")) && args.length == 2 && args[0].equalsIgnoreCase("debug")) {
             String input = args[1].toLowerCase();
-            List<String> allOptions = Arrays.asList("enable", "disable");
+            List<String> allOptions = Arrays.asList("true", "false");
             allOptions.sort(String::compareToIgnoreCase);
             return allOptions.stream()
                     .filter(option -> option.toLowerCase().startsWith(input))
