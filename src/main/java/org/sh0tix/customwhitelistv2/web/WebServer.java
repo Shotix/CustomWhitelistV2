@@ -7,6 +7,7 @@ import com.sun.net.httpserver.HttpServer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.sh0tix.customwhitelistv2.CustomWhitelistV2;
 import org.sh0tix.customwhitelistv2.handlers.PasswordHandler;
 import org.sh0tix.customwhitelistv2.handlers.PlayerStatusHandler;
 import org.sh0tix.customwhitelistv2.handlers.WhitelistHandler;
@@ -17,9 +18,7 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class WebServer {
     private HttpServer server;
@@ -29,10 +28,15 @@ public class WebServer {
         try {
             server = HttpServer.create(new InetSocketAddress(7777), 0);
             server.createContext("/", new MyHandler());
+            server.createContext("/api/getDebugMode", new GetDebugModeHandler());
             server.createContext("/api/players", new PlayerHandler());
             server.createContext("/api/updatePassword", new UpdatePasswordHandler());
             server.createContext("/api/players/", new PlayerDetailsHandler());
             server.createContext("/api/updatePlayerStatus", new UpdatePlayerStatusHandler());
+            server.createContext("/api/getLocalization", new GetSelectedLanguage());
+            server.createContext("/api/setDebugMode", new SetDebugModeHandler());
+            server.createContext("/api/setLocalization", new SetPluginLanguage());
+            server.createContext("/api/checkForCorrectTempPlayerStatuses", new CheckForCorrectTempPlayerStatuses());
             server.setExecutor(null); // creates a default executor
             server.start();
         } catch (Exception e) {
@@ -46,7 +50,134 @@ public class WebServer {
             server.stop(0);
         }
     }
+    
+    static class CheckForCorrectTempPlayerStatuses implements HttpHandler {
+        @Override
+        public void handle(HttpExchange t) throws IOException {
+            // Get all players
+            List<CWV2Player> players = PlayerStatusHandler.getAllPlayers();
+            
+            // Check if any player has a temporary status that has expired
+            for (CWV2Player player : players) {
+                PlayerStatusHandler.checkAndUpdatePlayerStatusIfTempBanOrKickIsExpired(player);
+            }
+        }
+    }
+    
+    /**
+     * Parse the form data from a POST request
+     * @param formData The form data
+     * @return A map with the form data
+     */
+    public static Map<String, String> parseFromData(String formData) {
+        Map<String, String> parameters = new HashMap<>();
+        String[] pairs = formData.split("&");
+        for (String pair : pairs) {
+            String[] keyValue = pair.split("=");
+            if (keyValue.length > 1) {
+                String key = keyValue[0];
+                String value = keyValue[1];
+                parameters.put(key, value);
+            } else {
+                parameters.put(keyValue[0], "");
+            }
+        }
 
+        return parameters;
+    }
+    
+    static class SetPluginLanguage implements HttpHandler {
+        @Override
+        public void handle(HttpExchange t) throws IOException {
+            // Read the request body
+            InputStreamReader isr = new InputStreamReader(t.getRequestBody(), StandardCharsets.UTF_8);
+            BufferedReader br = new BufferedReader(isr);
+            String query = br.readLine();
+
+            // Parse the debug mode from the request body
+            Map<String, String> parameters = parseFromData(query);
+
+            // Check if the parameter contains a valid language (de_DE, en_US)
+            String language = parameters.get("localization");
+            String response;
+            if (language.equals("German") || language.equals("English")) {
+                CustomWhitelistV2.getLocalizationHandler().saveSelectedLanguage(language.equals("German") ? "de_DE" : "en_US");
+                CustomWhitelistV2.getLocalizationHandler().loadLocalization(language.equals("German") ? "de_DE" : "en_US");
+                response = new Gson().toJson(true);
+            } else {
+                // Invalid response
+                response = new Gson().toJson(false);
+            }
+            byte[] bytes = response.getBytes(StandardCharsets.UTF_8);
+            t.sendResponseHeaders(200, bytes.length);
+            OutputStream os = t.getResponseBody();
+            os.write(bytes);
+            os.close();
+            return;
+        }
+    }
+    
+    static class SetDebugModeHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange t) throws IOException {
+            // Read the request body
+            InputStreamReader isr = new InputStreamReader(t.getRequestBody(), StandardCharsets.UTF_8);
+            BufferedReader br = new BufferedReader(isr);
+            String query = br.readLine();
+            
+            // Parse the debug mode from the request body
+            Map<String, String> parameters = parseFromData(query);
+            
+            // Check if the parameter contains a valid debug mode (Enabled, Disabled)
+            boolean debugMode = false;
+            if (Objects.equals(parameters.get("debugMode"), "Enabled")) {
+                debugMode = true;
+            } else if (parameters.get("debugMode") == null) {
+                // Invalid response
+                String response = new Gson().toJson(false);
+                byte[] bytes = response.getBytes(StandardCharsets.UTF_8);
+                t.sendResponseHeaders(200, bytes.length);
+                OutputStream os = t.getResponseBody();
+                os.write(bytes);
+                os.close();
+                return;
+            }
+            
+            // Set the debug mode
+            CustomWhitelistV2.setDebugMode(debugMode);
+            
+            String response = new Gson().toJson(true);
+            byte[] bytes = response.getBytes(StandardCharsets.UTF_8);
+            t.sendResponseHeaders(200, bytes.length);
+            OutputStream os = t.getResponseBody();
+            os.write(bytes);
+            os.close();
+        }
+    }
+    
+    static class GetSelectedLanguage implements HttpHandler {
+        @Override
+        public void handle(HttpExchange t) throws IOException {
+            String response = new Gson().toJson(CustomWhitelistV2.getSelectedLanguage());
+            byte[] bytes = response.getBytes(StandardCharsets.UTF_8);
+            t.sendResponseHeaders(200, bytes.length);
+            OutputStream os = t.getResponseBody();
+            os.write(bytes);
+            os.close();
+        }
+    }
+
+    static class GetDebugModeHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange t) throws IOException {
+            String response = new Gson().toJson(CustomWhitelistV2.getDebugMode());
+            byte[] bytes = response.getBytes(StandardCharsets.UTF_8);
+            t.sendResponseHeaders(200, bytes.length);
+            OutputStream os = t.getResponseBody();
+            os.write(bytes);
+            os.close();
+        }
+    }
     
     static class UpdatePlayerStatusHandler implements HttpHandler {
         @Override
@@ -57,7 +188,7 @@ public class WebServer {
             String query = br.readLine();
             
             // Parse the player status from the request body
-            Map<String, String> parameters = parseFormData(query);
+            Map<String, String> parameters = parseFromData(query);
             
             // Get the players UUID from the username
             String UUID = PlayerStatusHandler.getPlayerUuidFromName(parameters.get("username"));
@@ -98,23 +229,6 @@ public class WebServer {
             OutputStream os = t.getResponseBody();
             os.write(bytes);
             os.close();
-        }
-
-        private Map<String, String> parseFormData(String formData) {
-            Map<String, String> parameters = new HashMap<>();
-            String[] pairs = formData.split("&");
-            for (String pair : pairs) {
-                String[] keyValue = pair.split("=");
-                if (keyValue.length > 1) {
-                    String key = keyValue[0];
-                    String value = keyValue[1];
-                    parameters.put(key, value);
-                } else {
-                    parameters.put(keyValue[0], "");
-                }
-            }
-
-            return parameters;
         }
     }
 
@@ -170,7 +284,7 @@ public class WebServer {
             String query = br.readLine();
 
             // Parse the current and new password from the request body
-            Map<String, String> parameters = parseFormData(query);
+            Map<String, String> parameters = parseFromData(query);
             String currentPassword = parameters.get("currentPassword");
             String newPassword = parameters.get("newPassword");
 
@@ -192,26 +306,8 @@ public class WebServer {
             os.write(bytes);
             os.close();
         }
-
-        private Map<String, String> parseFormData(String formData) {
-            Map<String, String> parameters = new HashMap<>();
-            String[] pairs = formData.split("&");
-            for (String pair : pairs) {
-                String[] keyValue = pair.split("=");
-                if (keyValue.length > 1) {
-                    String key = keyValue[0];
-                    String value = keyValue[1];
-                    parameters.put(key, value);
-                } else {
-                    parameters.put(keyValue[0], "");
-                }
-            }
-            
-            return parameters;
-        }
     }
     
-
     static class PlayerHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange t) throws IOException {
