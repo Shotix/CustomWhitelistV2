@@ -53,7 +53,7 @@ public class WebServer {
     
     static class CheckForCorrectTempPlayerStatuses implements HttpHandler {
         @Override
-        public void handle(HttpExchange t) throws IOException {
+        public void handle(HttpExchange t) {
             // Get all players
             List<CWV2Player> players = PlayerStatusHandler.getAllPlayers();
             
@@ -113,7 +113,6 @@ public class WebServer {
             OutputStream os = t.getResponseBody();
             os.write(bytes);
             os.close();
-            return;
         }
     }
     
