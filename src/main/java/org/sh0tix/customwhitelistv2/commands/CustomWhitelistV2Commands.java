@@ -11,7 +11,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.apache.commons.lang3.EnumUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -233,7 +232,7 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                     playerToAdd.setNumberOfWrongPasswordsEntered(0);
                     
                     // Add the player to the custom whitelist
-                    PlayerStatusHandler.insertNewPlayer(playerToAdd);
+                    PlayerStatusHandler.insertNewPlayerIntoFile(playerToAdd);
                     
                     commandSender.sendMessage(Component.text()
                             .append(Component.text("[CustomWhitelistV2] Added the player ", NamedTextColor.GREEN))
@@ -359,7 +358,7 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 }
                 
                 // Get the player by its UUID
-                CWV2Player playerToCheckStatus = PlayerStatusHandler.FindPlayerByUUID(playerUuid);
+                CWV2Player playerToCheckStatus = PlayerStatusHandler.getPlayerByUUID(playerUuid);
                 
                 // Send the command sender a message with the status of the player
                 assert playerToCheckStatus != null;
@@ -405,7 +404,7 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                 }
                 
                 // Check if the new status is the same as the old status
-                if (Objects.requireNonNull(PlayerStatusHandler.FindPlayerByUUID(playerUuidToUpdate)).getStatus() == CWV2Player.Status.valueOf(status)) {
+                if (Objects.requireNonNull(PlayerStatusHandler.getPlayerByUUID(playerUuidToUpdate)).getStatus() == CWV2Player.Status.valueOf(status)) {
                     commandSender.sendMessage(Component.text()
                             .append(Component.text("[CustomWhitelistV2] The status of the player ", NamedTextColor.RED))
                             .append(Component.text(playerNameToUpdate, NamedTextColor.WHITE))
@@ -457,14 +456,14 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                             reason.append(args[i]).append(" ");
                         }
 
-                        PlayerStatusHandler.setPlayerIsTempBannedOrTempKicked(PlayerStatusHandler.FindPlayerByUUID(playerUuidToUpdate), CWV2Player.Status.valueOf(status), reason.toString(), duration);
+                        PlayerStatusHandler.setPlayerIsTempBannedOrTempKicked(PlayerStatusHandler.getPlayerByUUID(playerUuidToUpdate), CWV2Player.Status.valueOf(status), reason.toString(), duration);
                         
                         // If the player is online, give the player all the effects a banned player would have
                         if (playerOnline != null) {
                             WhitelistHandler.disablePlayerMovementAndSight(playerOnline);
                             
                             // Send the player a message that they have been banned or kicked and that they can no longer join the server
-                            Component kickMessage = PlayerStatusHandler.getTempBanOrTempKickMessage(Objects.requireNonNull(PlayerStatusHandler.FindPlayerByUUID(playerUuidToUpdate)));
+                            Component kickMessage = PlayerStatusHandler.getTempBanOrTempKickMessage(Objects.requireNonNull(PlayerStatusHandler.getPlayerByUUID(playerUuidToUpdate)));
                             
                             // Kick the player from the server
                             playerOnline.kick(kickMessage);
