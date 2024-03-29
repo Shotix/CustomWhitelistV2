@@ -10,7 +10,6 @@ import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.types.PermissionNode;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -29,13 +28,13 @@ public class EventListener implements Listener {
     @EventHandler
     public void onPlayerMoveEvent(PlayerMoveEvent playerMoveEvent) {
         // When a player moves, check if they are whitelisted. If they are not, cancel the event
-        CWV2Player player = PlayerStatusHandler.FindPlayerByUUID(playerMoveEvent.getPlayer().getUniqueId().toString());
+        CWV2Player player = PlayerStatusHandler.getPlayerByUUID(playerMoveEvent.getPlayer().getUniqueId().toString());
         
         if (player == null) {
             return;
         }
         
-        if (player.getStatus() == CWV2Player.Status.NOT_WHITELISTED) {
+        if (player.getStatus() != CWV2Player.Status.WHITELISTED) {
             playerMoveEvent.setCancelled(true);
         }
     }
@@ -62,15 +61,15 @@ public class EventListener implements Listener {
         // When a player joins the server, check if they exist in the JSON file
         // If they do, check their status and act accordingly
         // If they don't, add them to the JSON file with the status "notWhitelisted"
-        CWV2Player joinedPlayer = PlayerStatusHandler.FindPlayerByUUID(playerJoinEvent.getPlayer().getUniqueId().toString());
+        CWV2Player joinedPlayer = PlayerStatusHandler.getPlayerByUUID(playerJoinEvent.getPlayer().getUniqueId().toString());
         
         if (joinedPlayer == null) {
             // Create a new player and add them to the JSON file
             CWV2Player newPlayer = new CWV2Player(playerJoinEvent.getPlayer().getUniqueId().toString(), playerJoinEvent.getPlayer().getName(), 1);
-            PlayerStatusHandler.insertNewPlayer(newPlayer);
+            PlayerStatusHandler.insertNewPlayerIntoFile(newPlayer);
             
             // Player should now be in the JSON file. Retrieve the player from the JSON file and update the joinedPlayer variable
-            joinedPlayer = PlayerStatusHandler.FindPlayerByUUID(playerJoinEvent.getPlayer().getUniqueId().toString());
+            joinedPlayer = PlayerStatusHandler.getPlayerByUUID(playerJoinEvent.getPlayer().getUniqueId().toString());
         }
         
         // Player exists in the JSON file
@@ -79,22 +78,9 @@ public class EventListener implements Listener {
         
         
         // Check if the user has a status of TEMP_BANNED or TEMP_KICKED and if the time has passed
-        if (joinedPlayer.getStatus() == CWV2Player.Status.TEMP_BANNED) {
-            // Check if the time has passed
-            if (PlayerStatusHandler.getTempBanOrTempKickExpiryDate(joinedPlayer).before(new Date())) {
-                // Time has passed. Set the status to NOT_WHITELISTED
-                joinedPlayer.setStatus(CWV2Player.Status.NOT_WHITELISTED);
-                PlayerStatusHandler.updatePlayerStatus(joinedPlayer.getUuid(), CWV2Player.Status.NOT_WHITELISTED);
-            }
-        } else if (joinedPlayer.getStatus() == CWV2Player.Status.TEMP_KICKED) {
-            if (PlayerStatusHandler.getTempBanOrTempKickExpiryDate(joinedPlayer).before(new Date())) {
-                // Time has passed. Set the status to WHITELISTED
-                joinedPlayer.setStatus(CWV2Player.Status.WHITELISTED);
-                PlayerStatusHandler.updatePlayerStatus(joinedPlayer.getUuid(), CWV2Player.Status.WHITELISTED);
-            }
-        }
+        PlayerStatusHandler.checkAndUpdatePlayerStatusIfTempBanOrKickIsExpired(joinedPlayer);
         
-        
+        // Update the number of times the player has joined the server
         PlayerStatusHandler.updateNumberOfTimesJoined(joinedPlayer.getUuid());
 
         // Check their status and act accordingly
@@ -103,12 +89,6 @@ public class EventListener implements Listener {
                 // Player is whitelisted. Allow them to join the server
                 // Make sure the user is able to see, move and chat
                 WhitelistHandler.enablePlayerMovementAndSight(playerJoinEvent.getPlayer());
-                
-                /* Construct the message that will be send to the player
-                * The message will look like this:
-                *   "Welcome back to the server <player name>"
-                *   "You have joined the server <number of times joined> times"
-                 */
                 
                 // Tell the user they are welcome back to the server
                 playerJoinEvent.getPlayer().sendMessage(Component.text()
