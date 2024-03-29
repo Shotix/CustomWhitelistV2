@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.sh0tix.customwhitelistv2.CustomWhitelistV2;
 
 import java.io.File;
 import java.io.FileReader;
@@ -27,6 +28,7 @@ public class LocalizationHandler {
     public void saveSelectedLanguage(String languageCode) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("selectedLanguage", languageCode);
+        CustomWhitelistV2.setSelectedLanguage(languageCode);
 
         try (FileWriter file = new FileWriter(plugin.getDataFolder() + "/localization/status.json")) {
             Gson gson = new GsonBuilder()
@@ -55,13 +57,11 @@ public class LocalizationHandler {
 
     public void loadLocalization(String languageCode) {
         File localizationFile = new File(plugin.getDataFolder(), "localization/" + languageCode + ".yml");
-        if (localizationFile.exists()) {
-            localization = YamlConfiguration.loadConfiguration(localizationFile);
-        } else {
+        if (!localizationFile.exists()) {
             plugin.getLogger().warning("Localization file for language code " + languageCode + " not found! Falling back to en_US.yml...");
             localizationFile = new File(plugin.getDataFolder(), "localization/en_US.yml");
-            localization = YamlConfiguration.loadConfiguration(localizationFile);
         }
+        localization = YamlConfiguration.loadConfiguration(localizationFile);
     }
 
     public void saveDefaultLocalizationFile(String fileName) {
