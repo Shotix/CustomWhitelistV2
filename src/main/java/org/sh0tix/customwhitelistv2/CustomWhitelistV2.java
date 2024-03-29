@@ -36,7 +36,16 @@ public final class CustomWhitelistV2 extends JavaPlugin {
     
     public static void setDebugMode(boolean debugMode) {
         instance.debugMode = debugMode;
-        
+    }
+    
+    private String selectedLanguage;
+    
+    public static String getSelectedLanguage() {
+        return instance.selectedLanguage;
+    }
+    
+    public static void setSelectedLanguage(String selectedLanguage) {
+        instance.selectedLanguage = selectedLanguage;
     }
     
     public static CustomWhitelistV2 getInstance() {
@@ -50,12 +59,14 @@ public final class CustomWhitelistV2 extends JavaPlugin {
         // Set up localisation and load the selected language
         localizationHandler.saveDefaultLocalizationFile("en_US.yml");
         localizationHandler.saveDefaultLocalizationFile("de_DE.yml");
-        localizationHandler.loadLocalization(localizationHandler.loadSelectedLanguage());
+        selectedLanguage = localizationHandler.loadSelectedLanguage();
+        localizationHandler.loadLocalization(selectedLanguage);
         getLogger().info(localizationHandler.getLocalisedString("CustomWhitelistV2.onEnable.localization_initialization"));
         
         // Set up the web files
         saveResource("web/index.html", true);
         saveResource("web/changePassword.html", true);
+        saveResource("web/playerJoinStuff.html", true);
         
         // Start the web server
         webServer = new WebServer();
