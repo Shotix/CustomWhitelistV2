@@ -19,30 +19,6 @@ import java.util.Date;
 import java.util.List;
 
 public class PlayerStatusHandler {
-    
-    /*
-    This class will be used to handle the status of a player in the custom whitelist.
-    The status of a player will be stored in a separate json file, located in a folder called "CustomWhitelistV2" in the plugins folder.
-    The JSON file will be constructed as follows:
-    {
-        "playerUUID": "playerUUID", 
-        {
-            "playerName": "playerName",
-            "status": "whitelisted",
-            "lastUpdated": "2021-08-01T12:00:00Z",
-            "numberOfWrongPasswordsEntered": 0,
-            "numberOfTimesJoined": 5
-        },
-        "playerUUID": "playerUUID",
-        {
-            "playerName": "playerName",
-            "status": "notWhitelisted",
-            "lastUpdated": "2021-08-01T12:00:00Z",
-            "numberOfWrongPasswordsEntered": 3,
-            "numberOfTimesJoined": 0
-        }
-     }
-     */
 
     private static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(Component.class, new ComponentTypeAdapter())
@@ -72,7 +48,7 @@ public class PlayerStatusHandler {
      * Insert a new player into the JSON file
      * @param player The player to insert into the JSON file
      */
-    public static void insertNewPlayer(CWV2Player player) {
+    public static void insertNewPlayerIntoFile(CWV2Player player) {
         File file = getFile();
 
         try {
@@ -101,7 +77,7 @@ public class PlayerStatusHandler {
      * @param playerUUID The UUID of the player to find
      * @return The player if they exist in the JSON file, null otherwise
      */
-    public static CWV2Player FindPlayerByUUID(String playerUUID) {
+    public static CWV2Player getPlayerByUUID(String playerUUID) {
         File file = getFile();
 
         try {
@@ -135,6 +111,10 @@ public class PlayerStatusHandler {
         return players;
     }
     
+    /**
+     * Get all players from the JSON file
+     * @return A list of all players
+     */
     public static List<CWV2Player> getAllPlayers() {
         File file = getFile();
 
@@ -150,8 +130,8 @@ public class PlayerStatusHandler {
      * @param playerUUID The UUID of the player to update
      * @param status The new status of the player
      */
-    public static void updatePlayerStatus(String playerUUID, CWV2Player.Status status) {
-        CWV2Player player = FindPlayerByUUID(playerUUID);
+    public static synchronized void updatePlayerStatus(String playerUUID, CWV2Player.Status status) {
+        CWV2Player player = getPlayerByUUID(playerUUID);
         if (player != null) {
             player.setStatus(status);
             player.setLastUpdated(new Date());
@@ -163,8 +143,8 @@ public class PlayerStatusHandler {
      * Update the number of times a player has joined the server
      * @param playerUUID The UUID of the player to update
      */
-    public static void updateNumberOfTimesJoined(String playerUUID) {
-        CWV2Player player = FindPlayerByUUID(playerUUID);
+    public static synchronized void updateNumberOfTimesJoined(String playerUUID) {
+        CWV2Player player = getPlayerByUUID(playerUUID);
         if (player != null) {
             player.setNumberOfTimesJoined(player.getNumberOfTimesJoined() + 1);
             updatePlayerInformationInFile(playerUUID, player);
@@ -176,8 +156,8 @@ public class PlayerStatusHandler {
      * @param playerUUID The UUID of the player to update
      * @param numberOfTimesJoined The new number of times the player has joined the server
      */
-    public static void updateNumberOfTimesJoined(String playerUUID, int numberOfTimesJoined) {
-        CWV2Player player = FindPlayerByUUID(playerUUID);
+    public static synchronized void updateNumberOfTimesJoined(String playerUUID, int numberOfTimesJoined) {
+        CWV2Player player = getPlayerByUUID(playerUUID);
         if (player != null) {
             player.setNumberOfTimesJoined(numberOfTimesJoined);
             updatePlayerInformationInFile(playerUUID, player);
@@ -188,8 +168,8 @@ public class PlayerStatusHandler {
      * Update the number of wrong passwords entered by a player
      * @param playerUUID The UUID of the player to update
      */
-    public static void updateNumberOfWrongPasswordsEntered(String playerUUID) {
-        CWV2Player player = FindPlayerByUUID(playerUUID);
+    public static synchronized void updateNumberOfWrongPasswordsEntered(String playerUUID) {
+        CWV2Player player = getPlayerByUUID(playerUUID);
         if (player != null) {
             player.setNumberOfWrongPasswordsEntered(player.getNumberOfWrongPasswordsEntered() + 1);
             updatePlayerInformationInFile(playerUUID, player);
@@ -201,8 +181,8 @@ public class PlayerStatusHandler {
      * @param playerUUID The UUID of the player to update
      * @param numberOfWrongPasswordsEntered The new number of wrong passwords entered by the player
      */
-    public static void updateNumberOfWrongPasswordsEntered(String playerUUID, int numberOfWrongPasswordsEntered) {
-        CWV2Player player = FindPlayerByUUID(playerUUID);
+    public static synchronized void updateNumberOfWrongPasswordsEntered(String playerUUID, int numberOfWrongPasswordsEntered) {
+        CWV2Player player = getPlayerByUUID(playerUUID);
         if (player != null) {
             player.setNumberOfWrongPasswordsEntered(numberOfWrongPasswordsEntered);
             updatePlayerInformationInFile(playerUUID, player);
@@ -214,7 +194,7 @@ public class PlayerStatusHandler {
      * @param playerUUID The UUID of the player to update
      * @param updatedPlayerInformation The updated player information
      */
-    private static void updatePlayerInformationInFile(String playerUUID, CWV2Player updatedPlayerInformation) {
+    private static synchronized void updatePlayerInformationInFile(String playerUUID, CWV2Player updatedPlayerInformation) {
         File file = getFile();
 
         try {
@@ -260,7 +240,11 @@ public class PlayerStatusHandler {
         File file = getFile();
 
         try {
-            return getCwv2PlayersList(file);
+            
+            List<CWV2Player> players = getCwv2PlayersList(file);
+            players.removeIf(player -> player.getStatus() != CWV2Player.Status.NOT_WHITELISTED);
+            return players;
+            
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -296,7 +280,7 @@ public class PlayerStatusHandler {
      * Get all whitelisted players from the JSON file
      * @return A list of all whitelisted players
      */
-    private static Date generateExpiryDateFromTimeString(String timeString) {
+    private static Date getBanExpiryDateFromTimeString(String timeString) {
         // The input string will be build like this:
         // Number + h, m, w, d, y
         
@@ -308,9 +292,9 @@ public class PlayerStatusHandler {
                 case "s" -> Date.from(ZonedDateTime.now().plus(Duration.ofSeconds(number)).toInstant());
                 case "h" -> Date.from(ZonedDateTime.now().plus(Duration.ofHours(number)).toInstant());
                 case "m" -> Date.from(ZonedDateTime.now().plus(Duration.ofMinutes(number)).toInstant());
-                case "w" -> Date.from(ZonedDateTime.now().plus(Duration.ofDays(number * 7)).toInstant());
+                case "w" -> Date.from(ZonedDateTime.now().plus(Duration.ofDays(number * 7L)).toInstant());
                 case "d" -> Date.from(ZonedDateTime.now().plus(Duration.ofDays(number)).toInstant());
-                case "y" -> Date.from(ZonedDateTime.now().plus(Duration.ofDays(number * 365)).toInstant());
+                case "y" -> Date.from(ZonedDateTime.now().plus(Duration.ofDays(number * 365L)).toInstant());
                 default -> null;
             };
         } catch (NumberFormatException e) {
@@ -325,7 +309,7 @@ public class PlayerStatusHandler {
      * @param expiryDate The date the player can rejoin the server
      * @return A reason component
      */
-    private static Component generateReasonComponentFromString(CWV2Player.Status newStatus, String reasonString, Date expiryDate) {
+    private static Component getBanReasonComponentFromString(CWV2Player.Status newStatus, String reasonString, Date expiryDate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime localDateTime = expiryDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         String formattedDate = localDateTime.format(formatter);
@@ -364,16 +348,16 @@ public class PlayerStatusHandler {
             for (CWV2Player p : players) {
                 if (p.getUuid().equals(player.getUuid())) {
                     p.setStatus(status);
-                    p.setTempBannedOrKicked(generateExpiryDateFromTimeString(timeString), generateReasonComponentFromString(status, reasonString, generateExpiryDateFromTimeString(timeString)));
+                    p.setTempBannedOrKicked(getBanExpiryDateFromTimeString(timeString), getBanReasonComponentFromString(status, reasonString, getBanExpiryDateFromTimeString(timeString)));
                     
                     updatePlayerInformationInFile(p.getUuid(), p);
                 }
             }
             
             // Debugging console message, if debug flag is set to true
-            if (CustomWhitelistV2.debugMode) {
-                CustomWhitelistV2.getInstance().getLogger().info("Player " + player.getUsername() + " has been " + status + " until " + generateExpiryDateFromTimeString(timeString));
-                CustomWhitelistV2.getInstance().getLogger().info("Reason: " + generateReasonComponentFromString(status, reasonString, generateExpiryDateFromTimeString(timeString)));
+            if (CustomWhitelistV2.getDebugMode()) {
+                CustomWhitelistV2.getInstance().getLogger().info("Player " + player.getUsername() + " has been " + status + " until " + getBanExpiryDateFromTimeString(timeString));
+                CustomWhitelistV2.getInstance().getLogger().info("Reason: " + getBanReasonComponentFromString(status, reasonString, getBanExpiryDateFromTimeString(timeString)));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -396,5 +380,26 @@ public class PlayerStatusHandler {
      */
     public static Date getTempBanOrTempKickExpiryDate(CWV2Player player) {
         return player.getDateOfUnbanOrUnkick();
+    }
+    
+    /**
+     * Check if a player is temp banned or temp kicked
+     * @param player The player to check
+     */
+    public static void checkAndUpdatePlayerStatusIfTempBanOrKickIsExpired(CWV2Player player) {
+        if (player.getStatus() == CWV2Player.Status.TEMP_BANNED) {
+            // Check if the time has passed
+            if (PlayerStatusHandler.getTempBanOrTempKickExpiryDate(player).before(new Date())) {
+                // Time has passed. Set the status to NOT_WHITELISTED
+                player.setStatus(CWV2Player.Status.NOT_WHITELISTED);
+                PlayerStatusHandler.updatePlayerStatus(player.getUuid(), CWV2Player.Status.NOT_WHITELISTED);
+            }
+        } else if (player.getStatus() == CWV2Player.Status.TEMP_KICKED) {
+            if (PlayerStatusHandler.getTempBanOrTempKickExpiryDate(player).before(new Date())) {
+                // Time has passed. Set the status to WHITELISTED
+                player.setStatus(CWV2Player.Status.WHITELISTED);
+                PlayerStatusHandler.updatePlayerStatus(player.getUuid(), CWV2Player.Status.WHITELISTED);
+            }
+        }
     }
 }

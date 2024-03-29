@@ -1,0 +1,57 @@
+# Language strings for English (United States)
+# The information is structured class by class > method by method > message by message with the possibility of having multiple messages for the same method
+
+# Class: CustomWhitelistV2
+CustomWhitelistV2:
+  
+  onEnable:
+    web_server_started: "Webserver has been started on localhost! Please open the following link in your browser: http://localhost:7777"
+    papermc_not_used: "This plugin is designed to work with PaperMC only! Disabling CustomWhitelistV2..."
+    luckperms_not_found: 
+      message_not_found: "LuckPerms not found! Disabling CustomWhitelistV2..."
+      message_installation_information: "Please install LuckPerms and restart the server!"
+      message_install_link: "You can download LuckPerms from: https://luckperms.net/download"
+      
+    luckperms_initialization: "There was an issue with LuckPerms! Disabling CustomWhitelistV2..."
+    localization_initialization: "Setting up localisation..."
+    plugin_enabled_successfully:
+      console_message: "CustomWhitelistV2 plugin has been enabled!"
+      administrator_message: "[CustomWhitelistV2] CustomWhitelistV2 plugin has been enabled!"
+      
+  onDisable:
+    plugin_disabled_successfully:
+      console_message: "CustomWhitelistV2 plugin has been disabled!"
+      administrator_message: "[CustomWhitelistV2] CustomWhitelistV2 plugin has been disabled!"
+      
+
+# TODO: AdminCommand
+
+# TODO: CustomWhitelistV2Commands
+  
+# TODO: LoginCommand
+
+# TODO: MsgModeratorCommand
+
+# TODO: LocalizationHandler
+
+# TODO: LuckPermsHandler
+
+# TODO: PasswordHandler
+
+# TODO: PlayerStatusHandler
+
+# TODO: WhitelistHandler
+
+# TODO: ChatListener
+
+# TODO: EventListener
+
+# TODO: CWV2Player
+
+# TODO: Password
+
+# TODO: ComponentTypeAdapter
+
+# TODO: CustomWhitelistV2AdminTabCompleter
+
+# TODO: CustomWhitelistV2TabCompleter

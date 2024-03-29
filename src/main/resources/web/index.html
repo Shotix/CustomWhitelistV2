@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Homepage</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="index.html">CustomWhitelistV2</a>
+    <!-- Navigate to the changePassword.html file --->
+    <a class="nav-link" href="changePassword.html">Change Password</a>
+    <a class="nav-link" href="playerJoinStuff.html">Player Join Information</a>
+</nav>
+
+<div class="container">
+    <h1 class="mt-4 mb-4" id="page-title">Homepage</h1>
+    
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Welcome to CustomWhitelistV2</h5>
+            <p class="card-text">This is a simple web application that allows you to manage your Minecraft server's whitelist.</p>
+            <p class="card-text">You can view and edit players on the whitelist.</p>
+            <p class="card-text">You can also enable or disable debug mode and change the plugin language.</p>
+            <p class="card-text">If you find any bugs or have any suggestions, please let me know over at the plugins <a href="https://github.com/Shotix/CustomWhitelistV2">GitHub</a> page</p>
+        </div>
+    </div>
+
+    <!-- Quick Settings table -->
+    <table class="table table-striped" id="quickSettingsTable">
+        <thead>
+        <!-- Table header will be inserted here -->
+        </thead>
+        <tbody>
+        <!-- Player details will be inserted here -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Check if the temp statuses are still up to date
+    fetch('/api/checkForCorrectTempPlayerStatuses')
+    
+    let quickSettingsTable = document.getElementById('quickSettingsTable');
+    
+    let debugRow = quickSettingsTable.insertRow();
+    debugRow.insertCell().textContent = 'Debug Mode';
+    debugRow.cells[0].style.fontWeight = 'bold';
+    
+    let debugSelect = document.createElement('select');
+    
+    fetch('/api/getDebugMode')
+        .then(response => response.json())
+        .then(data => {
+            let selectedStatus;
+            if (data) {
+                selectedStatus = 'Enabled';
+            } else {
+                selectedStatus = 'Disabled';
+            }
+            
+            let statuses = ["Enabled", "Disabled"];
+            statuses.forEach(status => {
+                let option = document.createElement('option');
+                option.textContent = status;
+                if (status === selectedStatus) {
+                    option.selected = true;
+                }
+                debugSelect.appendChild(option);
+            });
+        });
+    
+    debugRow.insertCell().appendChild(debugSelect);
+    
+    debugSelect.addEventListener('change', (event) => {
+        console.log("Debug Change detected: " + event.target.value);
+        fetch('http://localhost:7777/api/setDebugMode', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'debugMode=' + event.target.value
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data) {
+                    // Do nothing
+                } else {
+                    // Change the debug mode back to the previous one and show an error message
+                    alert('Failed to change the debug mode. Please try again later.');
+                    debugSelect.value = debugSelect.value === 'Enabled' ? 'Disabled' : 'Enabled';
+                }
+            })
+    });
+    
+    let localizationRow = quickSettingsTable.insertRow();
+    localizationRow.insertCell().textContent = 'Selected plugin language (not effecting the web interface)';
+    localizationRow.cells[0].style.fontWeight = 'bold';
+    
+    let languageSelect = document.createElement('select');
+    
+    fetch('/api/getLocalization')
+        .then(response => response.json())
+        .then(data => {
+            console.log("Localization: " + data);
+            let selectedLanguage;
+            if (data === 'de_DE') {
+                selectedLanguage = 'German';
+            } else if (data === 'en_US') {
+                selectedLanguage = 'English';
+            }
+            
+            let languages = ["German", "English"];
+            languages.forEach(language => {
+                let option = document.createElement('option');
+                option.textContent = language;
+                if (language === selectedLanguage) {
+                    option.selected = true;
+                }
+                languageSelect.appendChild(option);
+            });
+        });
+    
+    languageSelect.addEventListener('change', (event) => {
+        console.log("Localization change detected: " +  event.target.value);
+        fetch('http://localhost:7777/api/setLocalization', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'localization=' + event.target.value
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data) {
+                    // Do nothing
+                } else {
+                    // Change the language back to the previous one and show an error message
+                    alert('Failed to change the language. Please try again later.');
+                    languageSelect.value = languageSelect.value === 'German' ? 'English' : 'German';
+                }
+            })
+    });
+    
+    localizationRow.insertCell().appendChild(languageSelect);
+    
+</script>
+<!-- Include Bootstrap JS and jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

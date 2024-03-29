@@ -41,10 +41,10 @@ public class AdminCommand implements CommandExecutor {
                 
                 String newState = args[1];
                 if (newState.equals("true")) {
-                    CustomWhitelistV2.debugMode = true;
+                    CustomWhitelistV2.setDebugMode(true);
                     commandSender.sendMessage(Component.text("\n[CustomWhitelistV2] Debug mode enabled", NamedTextColor.GREEN));
                 } else if (newState.equals("false")) {
-                    CustomWhitelistV2.debugMode = false;
+                    CustomWhitelistV2.setDebugMode(false);
                     commandSender.sendMessage(Component.text("\n[CustomWhitelistV2] Debug mode disabled", NamedTextColor.GREEN));
                 } else {
                     commandSender.sendMessage(Component.text("\nUsage: /customwhitelistv2admin debug <true/false>", NamedTextColor.RED));
@@ -111,6 +111,25 @@ public class AdminCommand implements CommandExecutor {
                 }
                 return true;
             }
+            
+            case "setPluginLanguage" -> {
+                if (args.length < 2) {
+                    commandSender.sendMessage(Component.text("\nUsage: /customwhitelistv2admin setPluginLanguage <languageCode>", NamedTextColor.RED));
+                    return true;
+                }
+                
+                // Set the plugin language
+                String languageCode = args[1];
+                if (languageCode.equals("de_DE") || languageCode.equals("en_US")) {
+                    CustomWhitelistV2.getLocalizationHandler().saveSelectedLanguage(languageCode);
+                    CustomWhitelistV2.getLocalizationHandler().loadLocalization(languageCode);
+                    commandSender.sendMessage(Component.text("\n[CustomWhitelistV2] Plugin language set to " + languageCode, NamedTextColor.GREEN));
+                    return true;
+                }
+                
+                commandSender.sendMessage(Component.text("\n[CustomWhitelistV2] Invalid language code", NamedTextColor.RED));
+                return true;
+            }
         }
         return false;
     }
@@ -128,14 +147,14 @@ public class AdminCommand implements CommandExecutor {
                     .append(Component.text(" has not joined the server yet", NamedTextColor.RED))
                     .build());
             
-            if (CustomWhitelistV2.debugMode) {
+            if (CustomWhitelistV2.getDebugMode()) {
                 CustomWhitelistV2.getInstance().getLogger().info("\n[CWV2 Debug] PlayerUUID is null");
             }
             return;
         }
 
         // Log the playerName and the playerUUID to the console if the debug mode is enabled
-        if (CustomWhitelistV2.debugMode) {
+        if (CustomWhitelistV2.getDebugMode()) {
             CustomWhitelistV2.getInstance().getLogger().info("\n[CWV2 Debug] PlayerName: " + playerName + "\n[CWV2 Debug] PlayerUUID: " + playerUUID);
         }
 

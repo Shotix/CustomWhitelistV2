@@ -6,8 +6,9 @@
 
   <groupId>org.sh0tix</groupId>
   <artifactId>CustomWhitelistV2</artifactId>
-  <version>1.0</version>
+  <version>1.2</version>
   <packaging>jar</packaging>
+    <description>CustomWhitelistV2 is a Minecraft plugin developed in Java using the Bukkit API. It provides a custom whitelist functionality with a variety of commands for server administrators and moderators.</description>
 
   <name>CustomWhitelistV2</name>
 

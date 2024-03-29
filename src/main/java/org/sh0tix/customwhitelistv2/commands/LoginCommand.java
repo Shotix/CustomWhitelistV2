@@ -16,8 +16,6 @@ import org.sh0tix.customwhitelistv2.handlers.PlayerStatusHandler;
 import org.sh0tix.customwhitelistv2.handlers.WhitelistHandler;
 import org.sh0tix.customwhitelistv2.whitelist.CWV2Player;
 
-import java.awt.print.Paper;
-
 public class LoginCommand implements CommandExecutor {
     
     @Override
@@ -28,7 +26,7 @@ public class LoginCommand implements CommandExecutor {
         }
         
         Player player = (Player) commandSender;
-        CWV2Player cwv2Player = PlayerStatusHandler.FindPlayerByUUID(String.valueOf(player.getUniqueId()));
+        CWV2Player cwv2Player = PlayerStatusHandler.getPlayerByUUID(String.valueOf(player.getUniqueId()));
         
         if (args.length == 0) {
             commandSender.sendMessage("[CustomWhitelistV2] Please provide a password");

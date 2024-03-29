@@ -18,7 +18,7 @@ public class CustomWhitelistV2AdminTabCompleter implements TabCompleter {
         // Debug command enable or disable
         if ((command.getName().equalsIgnoreCase("customWhitelistV2Admin") || command.getName().equalsIgnoreCase("cwv2a")) && args.length == 1) {
             String input = args[0].toLowerCase();
-            List<String> allOptions = Arrays.asList("debug", "addModerator" , "removeModerator", "listAllModerators");
+            List<String> allOptions = Arrays.asList("debug", "addModerator" , "removeModerator", "listAllModerators", "setPluginLanguage");
             allOptions.sort(String::compareToIgnoreCase);
             return allOptions.stream()
                     .filter(option -> option.toLowerCase().startsWith(input))
@@ -28,6 +28,15 @@ public class CustomWhitelistV2AdminTabCompleter implements TabCompleter {
         if ((command.getName().equalsIgnoreCase("customWhitelistV2Admin") || command.getName().equalsIgnoreCase("cwv2a")) && args.length == 2 && args[0].equalsIgnoreCase("debug")) {
             String input = args[1].toLowerCase();
             List<String> allOptions = Arrays.asList("enable", "disable");
+            allOptions.sort(String::compareToIgnoreCase);
+            return allOptions.stream()
+                    .filter(option -> option.toLowerCase().startsWith(input))
+                    .collect(Collectors.toList());
+        }
+
+        if ((command.getName().equalsIgnoreCase("customWhitelistV2Admin") || command.getName().equalsIgnoreCase("cwv2a")) && args.length == 2 && args[0].equalsIgnoreCase("setPluginLanguage")) {
+            String input = args[1].toLowerCase();
+            List<String> allOptions = Arrays.asList("de_DE", "en_US");
             allOptions.sort(String::compareToIgnoreCase);
             return allOptions.stream()
                     .filter(option -> option.toLowerCase().startsWith(input))
