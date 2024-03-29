@@ -1,6 +1,5 @@
 package org.sh0tix.customwhitelistv2.handlers;
 
-import it.unimi.dsi.fastutil.Hash;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
