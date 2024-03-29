@@ -207,11 +207,7 @@ public class CustomWhitelistV2Commands implements CommandExecutor {
                     // Get the inputted status of the new player from the args
                     String status = args[2];
                     CWV2Player.Status newPlayerStatus;
-                     
-                    if (status == null) {
-                        status = "THIS STATUS IS INVALID";
-                    }
-                    
+
                     // Check if the status is valid
                     try {
                         newPlayerStatus = CWV2Player.Status.valueOf(status);
