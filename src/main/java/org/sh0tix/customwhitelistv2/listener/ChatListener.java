@@ -18,7 +18,7 @@ public class ChatListener implements Listener {
         WhitelistHandler whitelistHandler = new WhitelistHandler();
         
         if (CustomWhitelistV2.getDebugMode()) {
-            Bukkit.getLogger().info("ChatListener: " + event.getPlayer().getName() + " tried to chat\nPlayer UUID: " + event.getPlayer().getUniqueId().toString() + "\nIs the player whitelisted?: " + !whitelistHandler.isPlayerNotWhitelisted(event.getPlayer().getUniqueId().toString()));
+            Bukkit.getLogger().info("ChatListener: " + event.getPlayer().getName() + " tried to chat\nPlayer UUID: " + event.getPlayer().getUniqueId() + "\nIs the player whitelisted?: " + !whitelistHandler.isPlayerNotWhitelisted(event.getPlayer().getUniqueId().toString()));
         }
 
         if (whitelistHandler.isPlayerNotWhitelisted(event.getPlayer().getUniqueId().toString())) {
