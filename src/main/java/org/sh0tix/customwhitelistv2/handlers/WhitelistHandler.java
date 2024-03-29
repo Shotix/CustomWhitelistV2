@@ -10,8 +10,8 @@ import java.util.List;
 
 public class WhitelistHandler {
     
-    private HashSet<CWV2Player> nonWhitelistedPlayers = new HashSet<>();
-    private HashSet<CWV2Player> whitelistedPlayers = new HashSet<>();
+    private final HashSet<CWV2Player> nonWhitelistedPlayers = new HashSet<>();
+    private final HashSet<CWV2Player> whitelistedPlayers = new HashSet<>();
     
     public WhitelistHandler() {
         retrieveAllNonWhitelistedPlayersFromJSON();
