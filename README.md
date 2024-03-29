@@ -13,16 +13,18 @@ CustomWhitelistV2 is a Minecraft plugin developed in Java using the Bukkit API. 
 - Update the status of a player (e.g., WHITELISTED, NOT_WHITELISTED, BANNED, KICKED, TEMP_BANNED, TEMP_KICKED, REMOVED, UNKNOWN).
 - Enable or disable specific sub-commands.
 - Check the status of a player.
-- Update and check passwords.
+- Update and check the join password.
 - Login functionality.
 - Send messages to all moderators.
+- Manage the plugin with a locally hosted web server (open on Port 7777)
+- Change the language of the plugin (work in progress)
 
 ## Commands
 
-- `/customWhitelistV2 /customWhitelistV2 <enableOrDisableASubCommand|listAllActivatedSubCommands|addPlayer|removePlayer|listPlayers|statusOfPlayer|updatePlayerStatus|updatePassword|checkPassword|help>`
+- `/customWhitelistV2 <enableOrDisableASubCommand|listAllActivatedSubCommands|addPlayer|removePlayer|listPlayers|statusOfPlayer|updatePlayerStatus|updatePassword|checkPassword|help>`
 - `/login <password>`
 - `/msgModerator <message>`
-- `/customWhitelistV2Admin <enableOrDisable>`
+- `/customWhitelistV2Admin <debug|addModerator|removeModerator|listAllModerators|setPluginsLanguage>`
 
 ## Installation
 
