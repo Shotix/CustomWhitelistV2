@@ -5,6 +5,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.sh0tix.customwhitelistv2.CustomWhitelistV2;
 import org.sh0tix.customwhitelistv2.handlers.WhitelistHandler;
 
 import java.util.Objects;
@@ -15,6 +16,10 @@ public class ChatListener implements Listener {
     @EventHandler
     public void onChat(AsyncChatEvent event) {
         WhitelistHandler whitelistHandler = new WhitelistHandler();
+        
+        if (CustomWhitelistV2.getDebugMode()) {
+            Bukkit.getLogger().info("ChatListener: " + event.getPlayer().getName() + " tried to chat\nPlayer UUID: " + event.getPlayer().getUniqueId().toString() + "\nIs the player whitelisted?: " + !whitelistHandler.isPlayerNotWhitelisted(event.getPlayer().getUniqueId().toString()));
+        }
 
         if (whitelistHandler.isPlayerNotWhitelisted(event.getPlayer().getUniqueId().toString())) {
             event.setCancelled(true);
