@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import net.luckperms.api.model.user.UserManager;
 import org.sh0tix.customwhitelistv2.CustomWhitelistV2;
+import org.sh0tix.customwhitelistv2.handlers.LocalizationHandler;
 import org.sh0tix.customwhitelistv2.handlers.PlayerStatusHandler;
 
 import java.util.ArrayList;
@@ -22,6 +23,13 @@ import java.util.List;
 import java.util.UUID;
 
 public class AdminCommand implements CommandExecutor {
+    
+    private final LocalizationHandler localizationHandler;
+    
+    public AdminCommand() {
+        this.localizationHandler = CustomWhitelistV2.getLocalizationHandler();
+    }
+    
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String string, @NotNull String[] args) {
         if (args.length == 0) {
@@ -33,28 +41,26 @@ public class AdminCommand implements CommandExecutor {
         switch (firstSubCommand) {
             case "debug" -> {
                 if (args.length < 2) {
-                    commandSender.sendMessage(Component.text("\nUsage: /customwhitelistv2admin addModerator <player>", NamedTextColor.RED));
+                    commandSender.sendMessage(Component.text(localizationHandler.getLocalisedString("AdminCommand.onCommand.debug.usage"), NamedTextColor.RED));
                     return true;
                 }
-
-                commandSender.sendMessage(Component.text("\n[CustomWhitelistV2] This is a highly experimental feature and is not correctly implemented yet!", NamedTextColor.RED));
                 
                 String newState = args[1];
                 if (newState.equals("true")) {
                     CustomWhitelistV2.setDebugMode(true);
-                    commandSender.sendMessage(Component.text("\n[CustomWhitelistV2] Debug mode enabled", NamedTextColor.GREEN));
+                    commandSender.sendMessage(Component.text(localizationHandler.getLocalisedString("AdminCommand.onCommand.debug.enabled"), NamedTextColor.GREEN));
                 } else if (newState.equals("false")) {
                     CustomWhitelistV2.setDebugMode(false);
-                    commandSender.sendMessage(Component.text("\n[CustomWhitelistV2] Debug mode disabled", NamedTextColor.GREEN));
+                    commandSender.sendMessage(Component.text(localizationHandler.getLocalisedString("AdminCommand.onCommand.debug.disabled"), NamedTextColor.GREEN));
                 } else {
-                    commandSender.sendMessage(Component.text("\nUsage: /customwhitelistv2admin debug <true/false>", NamedTextColor.RED));
+                    commandSender.sendMessage(Component.text(localizationHandler.getLocalisedString("AdminCommand.onCommand.debug.usage"), NamedTextColor.RED));
                 }
                 return true;
             }
             
             case "addModerator" -> {
                 if (args.length < 2) {
-                    commandSender.sendMessage(Component.text("\nUsage: /customwhitelistv2admin addModerator <player>", NamedTextColor.RED));
+                    commandSender.sendMessage(Component.text(localizationHandler.getLocalisedString("AdminCommand.addModerator.usage"), NamedTextColor.RED));
                     return true;
                 }
                 
@@ -66,7 +72,7 @@ public class AdminCommand implements CommandExecutor {
             case "removeModerator" -> {
                 // Remove a moderator
                 if (args.length < 2) {
-                    commandSender.sendMessage(Component.text("\nUsage: /customwhitelistv2admin removeModerator <player>", NamedTextColor.RED));
+                    commandSender.sendMessage(Component.text(localizationHandler.getLocalisedString("AdminCommand.removeModerator.usage"), NamedTextColor.RED));
                     return true;
                 }
                 
@@ -85,11 +91,11 @@ public class AdminCommand implements CommandExecutor {
                         
                         // Message the moderator, that he has been removed (if they are online)
                         if (moderator.isOnline()) {
-                            moderator.sendMessage(Component.text("\n[CustomWhitelistV2] You have been removed from the CustomWhitelistV2 moderators", NamedTextColor.RED, TextDecoration.BOLD));
+                            moderator.sendMessage(Component.text(localizationHandler.getLocalisedString("AdminCommand.removeModerator.youWereRemoved"), NamedTextColor.RED, TextDecoration.BOLD));
                         }
                         
                         // Message the command sender, that the moderator has been removed
-                        commandSender.sendMessage(Component.text("\n[CustomWhitelistV2] " + moderator.getName() + " has been removed from the CustomWhitelistV2 moderators", NamedTextColor.GREEN, TextDecoration.BOLD));
+                        commandSender.sendMessage(Component.text("\n[CustomWhitelistV2] " + moderator.getName() + localizationHandler.getLocalisedString("AdminCommand.removeModerator.aModeratorWasRemoved"), NamedTextColor.GREEN, TextDecoration.BOLD));
                     }
                 }
                 return true;
@@ -101,11 +107,11 @@ public class AdminCommand implements CommandExecutor {
                 List<Player> moderators = listAllCWV2Moderators();
                 
                 if (moderators.isEmpty()) {
-                    commandSender.sendMessage(Component.text("\nNo moderators found", NamedTextColor.RED));
+                    commandSender.sendMessage(Component.text(localizationHandler.getLocalisedString("AdminCommand.onCommand.listAllModerators.noModerators"), NamedTextColor.RED));
                     return true;
                 }
                 
-                commandSender.sendMessage(Component.text("\n[CustomWhitelistV2] Moderators:", NamedTextColor.YELLOW, TextDecoration.BOLD));
+                commandSender.sendMessage(Component.text(localizationHandler.getLocalisedString("AdminCommand.onCommand.listAllModerators.moderators"), NamedTextColor.YELLOW, TextDecoration.BOLD));
                 for (Player moderator : moderators) {
                     commandSender.sendMessage(Component.text("\n" + moderator.getName(), NamedTextColor.GREEN));
                 }
@@ -142,20 +148,16 @@ public class AdminCommand implements CommandExecutor {
         if (playerUUID == null) {
             // Write a message to the command sender, that the player hasn't joined the server yet
             commandSender.sendMessage(Component.text()
-                    .append(Component.text("\n[CustomWhitelistV2] The player ", NamedTextColor.RED))
+                    .append(Component.text(localizationHandler.getLocalisedString("AdminCommand.addFromCustomWhitelist.playerHasNotJoinedYet.firstPart"), NamedTextColor.RED))
                     .append(Component.text(playerName, NamedTextColor.GREEN, TextDecoration.BOLD))
-                    .append(Component.text(" has not joined the server yet", NamedTextColor.RED))
+                    .append(Component.text(localizationHandler.getLocalisedString("AdminCommand.addFromCustomWhitelist.playerHasNotJoinedYet.secondPart"), NamedTextColor.RED))
                     .build());
-            
-            if (CustomWhitelistV2.getDebugMode()) {
-                CustomWhitelistV2.getInstance().getLogger().info("\n[CWV2 Debug] PlayerUUID is null");
-            }
             return;
         }
 
         // Log the playerName and the playerUUID to the console if the debug mode is enabled
         if (CustomWhitelistV2.getDebugMode()) {
-            CustomWhitelistV2.getInstance().getLogger().info("\n[CWV2 Debug] PlayerName: " + playerName + "\n[CWV2 Debug] PlayerUUID: " + playerUUID);
+            CustomWhitelistV2.getInstance().getLogger().info(localizationHandler.getLocalisedString("AdminCommand.addFromCustomWhitelist.logging.playerName") + playerName + localizationHandler.getLocalisedString("AdminCommand.addFromCustomWhitelist.logging.playerUUID") + playerUUID);
         }
 
         LuckPerms luckPerms = LuckPermsProvider.get();
@@ -166,7 +168,7 @@ public class AdminCommand implements CommandExecutor {
         if (user != null) {
             if (user.getCachedData().getPermissionData().checkPermission("customwhitelistv2.manage").asBoolean()) {
                 // Send the command sender a message, that the player is already a moderator
-                commandSender.sendMessage(Component.text("\n[CustomWhitelistV2] " + playerName + " is already a moderator", NamedTextColor.RED));
+                commandSender.sendMessage(Component.text("\n[CustomWhitelistV2] " + playerName + localizationHandler.getLocalisedString("AdminCommand.addFromCustomWhitelist.playerIsAlreadyModerator"), NamedTextColor.RED));
                 
                 return;
             }
@@ -177,17 +179,14 @@ public class AdminCommand implements CommandExecutor {
                 // Message the player, that he has been added to the CustomWhitelistV2 moderators
                 Player player = Bukkit.getPlayer(UUID.fromString(playerUUID));
                 if (player != null) {
-                    player.sendMessage(Component.text("\n[CustomWhitelistV2] You have been added to the CustomWhitelistV2 moderators", NamedTextColor.GREEN, TextDecoration.BOLD));
+                    player.sendMessage(Component.text(localizationHandler.getLocalisedString("AdminCommand.addFromCustomWhitelist.messageToPlayer"), NamedTextColor.GREEN, TextDecoration.BOLD));
                 }
                 
                 // Message the command sender, that the player has been added
-                CustomWhitelistV2.getInstance().getServer().getConsoleSender().sendMessage(Component.text("\n[CustomWhitelistV2] " + playerName + " has been added to the CustomWhitelistV2 moderators", NamedTextColor.GREEN, TextDecoration.BOLD));
+                CustomWhitelistV2.getInstance().getServer().getConsoleSender().sendMessage(Component.text("\n[CustomWhitelistV2] " + playerName + localizationHandler.getLocalisedString("AdminCommand.addFromCustomWhitelist.playerHasBeenAdded"), NamedTextColor.GREEN, TextDecoration.BOLD));
                 return;
             }
         }
-        
-        // Log that user is null to the server console
-        CustomWhitelistV2.getInstance().getLogger().warning("\n[CWV2 Debug] User is null");
     }
 
     private List<Player> listAllCWV2Moderators() {

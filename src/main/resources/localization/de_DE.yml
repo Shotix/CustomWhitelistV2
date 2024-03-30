@@ -24,7 +24,34 @@ CustomWhitelistV2:
       administrator_message: "[CustomWhitelistV2] CustomWhitelistV2 wurde deaktiviert!"
       
       
-# TODO: AdminCommand
+# Klasse: AdminCommand
+AdminCommand:
+  onCommand:
+    debug:
+      usage: "\nVerwendung: /customwhitelistv2admin debug <true/false>"
+      enabled: "\n[CustomWhitelistV2] Debug-Modus aktiviert"
+      disabled: "\n[CustomWhitelistV2] Debug-Modus deaktiviert"
+    addModerator:
+      usage: "\nVerwendung: /customwhitelistv2admin addModerator <Spieler>"
+    removeModerator:
+      usage: "\nVerwendung: /customwhitelistv2admin removeModerator <Spieler>"
+      youWereRemoved: "\n[CustomWhitelistV2] Sie wurden von den CustomWhitelistV2 Moderatoren entfernt"
+      aModeratorWasRemoved: " wurde von den CustomWhitelistV2 Moderatoren entfernt"
+    listAllModerators:
+      noModerators: "\n[CustomWhitelistV2] Es gibt keine Moderatoren in der CustomWhitelistV2"
+      moderators: "\n[CustomWhitelistV2] Moderatoren: "
+  
+  addFromCustomWhitelist:
+    playerHasNotJoinedYet:
+      firstPart: "\n[CustomWhitelistV2] Der Spieler "
+      secondPart: " hat den Server noch nicht betreten"
+    logging:
+      playerName: "\nSpielername: "
+      playerUUID: "\nSpieler UUID: "
+    playerIsAlreadyModerator: " ist bereits ein Moderator"
+    messageToPlayer: "\n[CustomWhitelistV2] Sie wurden zu den CustomWhitelistV2 Moderatoren hinzugefügt"
+    playerHasBeenAdded: " wurde zu den CustomWhitelistV2 Moderatoren hinzugefügt"
+  
   
 # TODO: CustomWhitelistV2Commands
 

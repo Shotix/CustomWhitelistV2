@@ -24,7 +24,34 @@ CustomWhitelistV2:
       administrator_message: "[CustomWhitelistV2] CustomWhitelistV2 plugin has been disabled!"
       
 
-# TODO: AdminCommand
+# Klasse: AdminCommand
+AdminCommand:
+  onCommand:
+    debug:
+      usage: "\nUsage: /customwhitelistv2admin debug <true/false>"
+      enabled: "\n[CustomWhitelistV2] Debug mode enabled"
+      disabled: "\n[CustomWhitelistV2] Debug mode disabled"
+    addModerator:
+      usage: "\nUsage: /customwhitelistv2admin addModerator <player>"
+    removeModerator:
+      usage: "\nUsage: /customwhitelistv2admin removeModerator <player>"
+      youWereRemoved: "\n[CustomWhitelistV2] You have been removed from the CustomWhitelistV2 moderators"
+      aModeratorWasRemoved: " has been removed from the CustomWhitelistV2 moderators"
+    listAllModerators:
+      noModerators: "\n[CustomWhitelistV2] There are no moderators in the CustomWhitelistV2"
+      moderators: "\n[CustomWhitelistV2] Moderators: "
+  
+  addFromCustomWhitelist:
+    playerHasNotJoinedYet:
+      firstPart: "\n[CustomWhitelistV2] The player "
+      secondPart: " has not joined the server yet"
+    logging:
+      playerName: "\nPlayer name: "
+      playerUUID: "\nPlayer UUID: "
+    playerIsAlreadyModerator: " is already a moderator"
+    messageToPlayer: "\n[CustomWhitelistV2] You have been added to the CustomWhitelistV2 moderators"
+    playerHasBeenAdded: " has been added to the CustomWhitelistV2 moderators"
+    
 
 # TODO: CustomWhitelistV2Commands
   
